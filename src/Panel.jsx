@@ -119,6 +119,14 @@ function Panel() {
   const baseURL = 'https://3607-2401-4900-1c5b-842-5942-b3cf-e8c-86bc.ngrok-free.app'
 
   async function getData(ratio1,unit1,vertical1,horizontal1,Id1,title1) {
+    let sendID
+
+    if(Id1===''){
+        sendID=Id
+    }else{
+       sendID=Id1
+    }
+
     try {
       const response = await axios.post(baseURL, {
         product: 500,
@@ -126,7 +134,7 @@ function Panel() {
         ratio: ratio1,
         horizontal: horizontal1,
         vertical: vertical1,
-        id: Id1,
+        id: sendID,
         title: title1,
       });
       console.log(response.data);
@@ -683,7 +691,7 @@ getData(e.target.value,unit,vertical,horizontal,id,title)
               px={2}
             >
               <Typography fontWeight={600}>20 AMP Circuits</Typography>
-              <Typography fontWeight={600}>{vertical * horizontal}</Typography>
+              <Typography fontWeight={600}>{panelData?.totalAMPS}</Typography>
             </Box>
           </Box>
         </Grid>
