@@ -156,10 +156,10 @@ function Panel() {
 
       //   Avoid updating ratio and unit unless they differ from the current state
       if (response.data.ratio !== ratio) setRatio(response.data.ratio);
-      const updatedUnit = units.find(
-        (data) => data.name === response.data.unit
+      const updatedUnit = units.filter(
+        (data) => data.unit === response.data.unit
       );
-      if (updatedUnit && updatedUnit.unit !== unit.unit) setUnit(updatedUnit);
+      if (updatedUnit && updatedUnit.unit !== unit.unit) setUnit(updatedUnit[0]);
     //   if (response.data.horizontal !== horizontal)
     //     setHorizontal(Math.round(response.data.horizontal));
     //   if (response.data.vertical !== vertical)
@@ -181,55 +181,86 @@ function Panel() {
   }
 
   useEffect(() => {
-    async function getData() {
+    async function fetchData() {
       let sendID;
 
       if (Id) {
         sendID = Id;
+
       } else {
         sendID = id;
       }
 
-      try {
-        const response = await axios.post(baseURL, {
-          product: 500,
-          unit: unit.unit,
-          ratio: ratio,
-          horizontal: initialHorizontal ? initialHorizontal : 16,
-          vertical: vertical,
-          id: sendID,
-          title: title,
-        });
-        console.log(response.data);
-        setPanelsX(response.data.panelsX);
-        setPanelsY(response.data.panelsY);
+      if(Id){
+        try {
+            const response = await axios.get(`${baseURL}/${Id}`);
 
-        //   Avoid updating ratio and unit unless they differ from the current state
-        if (response.data.ratio !== ratio) setRatio(response.data.ratio);
-        const updatedUnit = units.find(
-          (data) => data.name === response.data.unit
-        );
-        if (updatedUnit && updatedUnit.unit !== unit.unit) setUnit(updatedUnit);
-        if (response.data.horizontal !== horizontal)
-          setHorizontal(Math.round(response.data.horizontal));
-        if (response.data.vertical !== vertical)
-          setVertical(Math.round(response.data.vertical));
+            console.log(response.data)
 
-        setTitle(response.data.title);
-        setPanelData(response.data);
-        if (initialLoad.current && Id) {
-          setId(Id);
-          navigate(`/${Id}`);
-        } else if (response.data.id) {
-          setId(response.data.id);
-          navigate(`/${response.data.id}`);
+            setRatio(response.data.ratio)
+            const updatedUnit = units.filter(
+                (data) => data.unit === response.data.unit
+              );
+
+              console.log("updatedUnit")
+              console.log(updatedUnit)
+              console.log("updatedUnit")
+              if (updatedUnit && updatedUnit.unit !== unit.unit) setUnit(updatedUnit[0]);
+
+              setHorizontal(response.data.horizontal)
+              setVertical(response.data.vertical)
+
+            getData(response.data.ratio,updatedUnit[0],response.data.vertical,response.data.horizontal,Id,response.data.title)
+
+
+        } catch (error) {
+            console.log(error)
         }
-        initialLoad.current = false;
-      } catch (error) {
-        console.log(error);
+       
+      }else{
+        try {
+            const response = await axios.post(baseURL, {
+              product: 500,
+              unit: unit.unit,
+              ratio: ratio,
+              horizontal: initialHorizontal ? initialHorizontal : 16,
+              vertical: vertical,
+              id: sendID,
+              title: title,
+            });
+            console.log(response.data);
+            setPanelsX(response.data.panelsX);
+            setPanelsY(response.data.panelsY);
+    
+            //   Avoid updating ratio and unit unless they differ from the current state
+            if (response.data.ratio !== ratio) setRatio(response.data.ratio);
+            const updatedUnit = units.filter(
+              (data) => data.unit === response.data.unit
+            );
+            if (updatedUnit && updatedUnit.unit !== unit.unit) setUnit(updatedUnit[0]);
+            if (response.data.horizontal !== horizontal)
+              setHorizontal(Math.round(response.data.horizontal));
+            if (response.data.vertical !== vertical)
+              setVertical(Math.round(response.data.vertical));
+    
+            setTitle(response.data.title);
+            setPanelData(response.data);
+            if (initialLoad.current && Id) {
+              setId(Id);
+              navigate(`/${Id}`);
+            } else if (response.data.id) {
+              setId(response.data.id);
+              navigate(`/${response.data.id}`);
+            }
+            initialLoad.current = false;
+          } catch (error) {
+            console.log(error);
+          }
       }
+
+    
     }
-    getData();
+    fetchData();
   }, []); // Dependencies to trigger re-fetch
 
   const handleTitleChange = (e) => {
