@@ -78,7 +78,7 @@ export const selectStyle = {
   },
 };
 
-const versions = ["V1", "V2", "V3"];
+const versions = ["P 3.9", "P 3.1", "P 2.6"];
 const units = [
   { name: "IMPERIAL(FT)", unit: "FT" },
   { name: "MATRIC(M)", unit: "M" },
@@ -134,6 +134,16 @@ function Panel() {
     }
 
     try {
+
+        if(horizontal<1){
+            toast.error("Value cant be less than one");
+            return
+        }
+        if(vertical<1){
+            toast.error("Value cant be less than one");
+            return
+        }
+
       const response = await axios.post(baseURL, {
         product: 500,
         unit: unit1.unit,
@@ -277,19 +287,19 @@ function Panel() {
   };
   const handleHorizontalChange = (e) => {
     const value = Number(e.target.value);
-    if (value < 1) {
-      toast.error("Value cant be less than one");
+    // if (value < 1) {
+    //   toast.error("Value cant be less than one");
       
-    }
+    // }
     setHorizontal(value);
 
     getData(ratio, unit, vertical, value, id, title);
   };
   const handleVerticalChange = (e) => {
     const value = Number(e.target.value);
-    if (value < 1) {
-      toast.error("Value cant be less than one");
-    }
+    // if (value < 1) {
+    //   toast.error("Value cant be less than one");
+    // }
     setVertical(value);
   
 
@@ -339,6 +349,8 @@ function Panel() {
             alignItems: "center",
           }}
         >
+           <img src="/logoPanel.png" style={{height:'150px',objectFit:'cover',width:'150px',position:'absolute',top:-45,left:-30,zIndex:3}}/>
+
           {!isEditTitle ? (
             <Typography
               onClick={() => setSsEditTitle(true)}
@@ -634,6 +646,8 @@ function Panel() {
         <Grid
           maxHeight={"70vh"}
           overflow={"auto"}
+          mt={2}
+        //   bgcolor={'#dadded'}
           mr={1}
           size={12}
           boxShadow={
@@ -642,7 +656,7 @@ function Panel() {
           pt={1}
           borderRadius={3}
         >
-          <Box border={"1px solid grey"} pt={1} borderRadius={3} m={1}>
+          <Box  bgcolor={'#dadded'} pt={1} pb={1} borderRadius={3} m={1}>
             <Box
               display={"flex"}
               justifyContent={"space-between"}
@@ -681,7 +695,7 @@ function Panel() {
             </Box>
           </Box>
 
-          <Box border={"1px solid grey"} pt={1} borderRadius={3} m={1}>
+          <Box bgcolor={'#dadded'} pt={1} pb={1} borderRadius={3} m={1}>
             <Box
               display={"flex"}
               justifyContent={"space-between"}
@@ -720,7 +734,7 @@ function Panel() {
             </Box>
           </Box>
 
-          <Box border={"1px solid grey"} pt={1} borderRadius={3} m={1}>
+          <Box bgcolor={'#dadded'} pt={1} pb={1} borderRadius={3} m={1}>
             <Box
               display={"flex"}
               justifyContent={"space-between"}
@@ -760,7 +774,7 @@ function Panel() {
               </Typography>
             </Box>
           </Box>
-          <Box border={"1px solid grey"} pt={1} borderRadius={3} m={1}>
+          <Box bgcolor={'#dadded'} pt={1} pb={1} borderRadius={3} m={1}>
             <Box
               display={"flex"}
               justifyContent={"space-between"}
