@@ -143,7 +143,8 @@ function Panel() {
   //   const baseURL = 'https://panelcalculator.onrender.com'
   //   const baseURL =
   //     "https://3607-2401-4900-1c5b-842-5942-b3cf-e8c-86bc.ngrok-free.app";
-  const baseURL = "http://192.168.1.24:4000";
+//   const baseURL = "http://192.168.1.24:4000";
+const baseURL = "https://api.screencalculator.in";
 
   async function getData(
     ratio1,
