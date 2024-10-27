@@ -18,84 +18,85 @@ import { toast } from "react-toastify";
 import SettingsIcon from "@mui/icons-material/Settings";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import RefreshIcon from '@mui/icons-material/Refresh';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import RefreshIcon from "@mui/icons-material/Refresh";
+import CloseIcon from '@mui/icons-material/Close';
+
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 export const textFieldStyle = {
   "& .MuiOutlinedInput-root": {
     "& fieldset": {
-      borderColor: "#fff", // Initial outline color
+      borderColor: "black", // Initial outline color
     },
     "&:hover fieldset": {
-      borderColor: "#fff", // Outline color on hover
+      borderColor: "black", // Outline color on hover
     },
     "&.Mui-focused fieldset": {
-      borderColor: "#fff", // Outline color when focused
+      borderColor: "black", // Outline color when focused
     },
     color: "white",
     borderRadius: 3,
     height: "45px",
   },
   "& .MuiInputLabel-root": {
-    color: "#fff", // Initial label color
+    color: "black", // Initial label color
     fontSize: "13px", // Reduced label font size
   },
   "& .MuiInputLabel-root.Mui-focused": {
-    color: "#fff", // Label color when focused
+    color: "black", // Label color when focused
     fontSize: "13px", // Ensures size is consistent when focused
   },
   "& .MuiInputBase-input": {
-    color: "white", // Text color
+    color: "black", // Text color
   },
   "& .MuiInputBase-input::placeholder": {
-    color: "#fff", // Placeholder color
+    color: "black", // Placeholder color
   },
 };
 
 export const selectStyle = {
   "& .MuiOutlinedInput-root": {
     "& fieldset": {
-      borderColor: "#fff", // Initial outline color
+      borderColor: "black", // Initial outline color
     },
     "&:hover fieldset": {
-      borderColor: "#fff", // Outline color on hover
+      borderColor: "black", // Outline color on hover
     },
     "&.Mui-focused fieldset": {
-      borderColor: "#fff", // Outline color when focused
+      borderColor: "black", // Outline color when focused
     },
     "& .MuiSelect-select": {
-      color: "white", // Text color
+      color: "black", // Text color
     },
     borderRadius: 3,
     fontSize: "13px",
     height: "45px",
   },
   "& .MuiInputLabel-root": {
-    color: "#fff", // Initial label color
+    color: "black", // Initial label color
     fontSize: "13px", // Reduced label font size
   },
   "& .MuiInputLabel-root.Mui-focused": {
-    color: "#fff", // Label color when focused
+    color: "black", // Label color when focused
     fontSize: "13px", // Ensures size is consistent when focused
   },
 };
 
 const versions = ["P 3.9", "P 3.1", "P 2.6"];
 const units = [
-  { name: "IMPERIAL(FT)", unit: "FT" },
-  { name: "MATRIC(M)", unit: "M" },
-  { name: "PANELS", unit: "Panels" },
+  { name: "Feet(FT)", unit: "FT" },
+  { name: "Meter(M)", unit: "M" },
+  { name: "Panels", unit: "Panels" },
 ];
 const ratioData = ["16:9", "21:9", "4:3", "custom"];
 
 const panelArray = [
-    [true, true, true, true, true, true, true, true, true, true],
-    [true, true, true, true, true, true, true, true, true, true],
-    [true, true, true, true, true, true, true, true, true, true],
-    [true, true, true, true, true, true, true, true, true, true],
-    [true, true, true, true, true, true, true, true, true, true]
-  ];
-  
+  [true, true, true, true, true, true, true, true, true, true],
+  [true, true, true, true, true, true, true, true, true, true],
+  [true, true, true, true, true, true, true, true, true, true],
+  [true, true, true, true, true, true, true, true, true, true],
+  [true, true, true, true, true, true, true, true, true, true],
+];
 
 function Panel() {
   const initialHorizontal = localStorage.getItem("Horizontal");
@@ -104,7 +105,9 @@ function Panel() {
   const navigate = useNavigate();
   const initialLoad = useRef(true);
   const [title, setTitle] = useState("CLICK HERE TO ADD PROJECT TITLE");
+  const [screenName, setScreenName] = useState("CLICK HERE TO ADD SCREEN NAME");
   const [isEditTitle, setSsEditTitle] = useState(false);
+  const [isName, setName] = useState(false);
   const [type, setType] = useState(versions[0]);
   const [panelData, setPanelData] = useState({});
   const [id, setId] = useState("");
@@ -119,11 +122,10 @@ function Panel() {
   const [showSettings, setSettings] = useState(false);
   const [activePanels, setActivePanels] = useState(0);
 
+  console.log("first");
 
-  console.log("first")
-  
-  console.log(panels)
-  console.log("first")
+  console.log(panels);
+  console.log("first");
 
   const containerWidth = 400; // Fixed width for the container
   const containerHeight = 400; // Fixed height for the container
@@ -139,10 +141,22 @@ function Panel() {
   console.log("Screen Height:", screenHeight);
 
   //   const baseURL = 'https://panelcalculator.onrender.com'
-  const baseURL =
-    "https://3607-2401-4900-1c5b-842-5942-b3cf-e8c-86bc.ngrok-free.app";
+  //   const baseURL =
+  //     "https://3607-2401-4900-1c5b-842-5942-b3cf-e8c-86bc.ngrok-free.app";
+  const baseURL = "http://192.168.1.24:4000";
 
-  async function getData(ratio1, unit1, vertical1, horizontal1, Id1, title1, type1,panels1,activePanel1) {
+  async function getData(
+    ratio1,
+    unit1,
+    vertical1,
+    horizontal1,
+    Id1,
+    title1,
+    type1,
+    panels1,
+    activePanel1,
+    screenName1
+  ) {
     let sendID;
 
     if (Id1 === "") {
@@ -152,34 +166,28 @@ function Panel() {
     }
 
     try {
-
-        if(horizontal<1){
-            toast.error("Value cant be less than one");
-            return
-        }
-        if(vertical<1){
-            toast.error("Value cant be less than one");
-            return
-        }
+      //   if (horizontal < 1) {
+      //     toast.error("Value cant be less than one");
+      //     return;
+      //   }
+      //   if (vertical < 1) {
+      //     toast.error("Value cant be less than one");
+      //     return;
+      //   }
 
       const response = await axios.post(baseURL, {
         product: 500,
         unit: unit1.unit,
         ratio: ratio1,
         horizontal: horizontal1,
-        vertical:vertical1,
+        vertical: vertical1,
         id: sendID,
         title: title1,
-        product:type1,
-        panelMatrix:panels1,
-        activePanel:activePanel1
+        product: type1,
+        panelMatrix: panels1,
+        activePanel: activePanel1,
+        screenName: screenName1,
       });
-
-      localStorage.setItem("horizontal", horizontal1);
-      localStorage.setItem("vertical", vertical1);
-      localStorage.setItem("ratio", ratio1);
-      localStorage.setItem("unit", unit1.unit);
-      localStorage.setItem("title", title1);
 
       console.log(response.data);
       setPanelsX(response.data.panelsX);
@@ -190,14 +198,17 @@ function Panel() {
       const updatedUnit = units.filter(
         (data) => data.unit === response.data.unit
       );
-      if (updatedUnit && updatedUnit.unit !== unit.unit) setUnit(updatedUnit[0]);
-      if (response.data.product && response.data.product !== type) setType(response.data.product);
-    //   if (response.data.horizontal !== horizontal)
-    //     setHorizontal(Math.round(response.data.horizontal));
-    //   if (response.data.vertical !== vertical)
-    //     setVertical(Math.round(response.data.vertical));
+      if (updatedUnit && updatedUnit.unit !== unit.unit)
+        setUnit(updatedUnit[0]);
+      if (response.data.product && response.data.product !== type)
+        setType(response.data.product);
+      //   if (response.data.horizontal !== horizontal)
+      //     setHorizontal(Math.round(response.data.horizontal));
+      //   if (response.data.vertical !== vertical)
+      //     setVertical(Math.round(response.data.vertical));
 
       setTitle(response.data.title);
+      setScreenName(response.data.screenName);
       setPanelData(response.data);
       if (initialLoad.current && Id) {
         setId(Id);
@@ -212,130 +223,212 @@ function Panel() {
     }
   }
 
-
-  console.log(type)
-
   useEffect(() => {
     async function fetchData() {
       let sendID;
 
       if (Id) {
         sendID = Id;
-
       } else {
         sendID = id;
       }
 
-      if(Id){
+      if (Id) {
+        console.log("id>>>>>", id);
         try {
-            const response = await axios.get(`${baseURL}/${Id}`);
+          const response = await axios.get(`${baseURL}/${Id}`);
 
-            console.log(response.data)
+          if (!response.data) return;
 
-            setRatio(response.data.ratio)
-            const updatedUnit = units.filter(
-                (data) => data.unit === response.data.unit
-              );
+          setRatio(response.data.ratio);
+          const updatedUnit = units.filter(
+            (data) => data.unit === response.data.unit
+          );
 
-              console.log("updatedUnit")
-              console.log(updatedUnit)
-              console.log("updatedUnit")
-              if (updatedUnit && updatedUnit.unit !== unit.unit) setUnit(updatedUnit[0]);
+          if (updatedUnit && updatedUnit.unit !== unit.unit)
+            setUnit(updatedUnit[0]);
+          setHorizontal(response.data.horizontal);
+          setVertical(response.data.vertical);
+          setPanels(response.data.panelMatrix);
+          const trueCount = response.data.panelMatrix
+            .flat()
+            .filter((panel) => panel === true).length;
 
-              setHorizontal(response.data.horizontal)
-              setVertical(response.data.vertical)
-              console.log("PanelMatrix", response.data.panelMatrix)
-              setPanels(response.data.panelMatrix)
-              if (response.data.product && response.data.product !== type) setType(response.data.product);
+          console.log(trueCount);
 
+          setActivePanels(trueCount);
 
-            getData(response.data.ratio,updatedUnit[0],response.data.vertical,response.data.horizontal,Id,response.data.title,response.data.product)
+          if (response.data.product && response.data.product !== type)
+            setType(response.data.product);
 
-
+          getData(
+            response.data.ratio,
+            updatedUnit[0],
+            response.data.vertical,
+            response.data.horizontal,
+            Id,
+            response.data.title,
+            response.data.product,
+            response.data.panelMatrix,
+            trueCount,
+            response.data.screenName
+          );
         } catch (error) {
-            console.log(error)
+          console.log(error);
         }
-       
-      }else{
+      } else {
         try {
-            const response = await axios.post(baseURL, {
-              product: 500,
-              unit: unit.unit,
-              ratio: ratio,
-              horizontal: initialHorizontal ? initialHorizontal : 16,
-              vertical: vertical,
-              id: sendID,
-              title: title,
-              product:type?type:'p 3.9',
-              panelMatrix:panels
-            });
-            console.log(response.data);
-            setPanelsX(response.data.panelsX);
-            setPanelsY(response.data.panelsY);
-    
-            //   Avoid updating ratio and unit unless they differ from the current state
-            if (response.data.ratio !== ratio) setRatio(response.data.ratio);
-            const updatedUnit = units.filter(
-              (data) => data.unit === response.data.unit
-            );
-            if (updatedUnit && updatedUnit.unit !== unit.unit) setUnit(updatedUnit[0]);
-            if (response.data.horizontal !== horizontal)
-              setHorizontal(Math.round(response.data.horizontal));
-            if (response.data.vertical !== vertical)
-              setVertical(Math.round(response.data.vertical));
-            if (response.data.product && response.data.product !== type) setType(response.data.product);
-               
-            setTitle(response.data.title);
-            setPanelData(response.data);
-            if (initialLoad.current && Id) {
-              setId(Id);
-              navigate(`/${Id}`);
-            } else if (response.data.id) {
-              setId(response.data.id);
-              navigate(`/${response.data.id}`);
-            }
-            initialLoad.current = false;
-          } catch (error) {
-            console.log(error);
-          }
-      }
+          const response = await axios.post(baseURL, {
+            product: 500,
+            unit: unit.unit,
+            ratio: ratio,
+            horizontal: initialHorizontal ? initialHorizontal : 16,
+            vertical: vertical,
+            id: sendID,
+            title: title,
+            product: type ? type : "p 3.9",
+            panelMatrix: panels,
+            screenName: screenName,
+          });
+          console.log(response.data);
+          setPanelsX(response.data.panelsX);
+          setPanelsY(response.data.panelsY);
 
-    
+          //   Avoid updating ratio and unit unless they differ from the current state
+          if (response.data.ratio !== ratio) setRatio(response.data.ratio);
+          const updatedUnit = units.filter(
+            (data) => data.unit === response.data.unit
+          );
+          if (updatedUnit && updatedUnit.unit !== unit.unit)
+            setUnit(updatedUnit[0]);
+          if (response.data.horizontal !== horizontal)
+            if (response.data.vertical !== vertical)
+              if (response.data.product && response.data.product !== type)
+                // setHorizontal(Math.round(response.data.horizontal));
+                // setVertical(Math.round(response.data.vertical));
+                setType(response.data.product);
+
+          setTitle(response.data.title);
+          setScreenName(response.data.screenName);
+          setPanelData(response.data);
+          if (initialLoad.current && Id) {
+            setId(Id);
+            navigate(`/${Id}`);
+          } else if (response.data.id) {
+            setId(response.data.id);
+            navigate(`/${response.data.id}`);
+          }
+          initialLoad.current = false;
+        } catch (error) {
+          console.log(error);
+        }
+      }
     }
     fetchData();
   }, []); // Dependencies to trigger re-fetch
 
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
-    getData(ratio, unit, vertical, horizontal, id, e.target.value,type,panels,activePanels);
+    getData(
+      ratio,
+      unit,
+      vertical,
+      horizontal,
+      id,
+      e.target.value,
+      type,
+      panels,
+      activePanels,
+      screenName
+    );
   };
+  const handleNameChange = (e) => {
+    const value = e.target.value;
+    setScreenName(value); // Update the screenName in state
+    getData(
+      ratio,
+      unit,
+      vertical,
+      horizontal,
+      id,
+      title,
+      type,
+      panels,
+      activePanels,
+      value // Use `value` here
+    );
+  };
+
   const handleRatioChange = (e) => {
     setRatio(e.target.value);
-    getData(e.target.value, unit, vertical, horizontal, id, title,type,panels,activePanels);
+    getData(
+      e.target.value,
+      unit,
+      vertical,
+      horizontal,
+      id,
+      title,
+      type,
+      panels,
+      activePanels,
+      screenName
+    );
   };
   const handleUnitChange = (e) => {
     setUnit(e.target.value);
-    getData(ratio, e.target.value, vertical, horizontal, id, title,type,panels,activePanels);
+    getData(
+      ratio,
+      e.target.value,
+      vertical,
+      horizontal,
+      id,
+      title,
+      type,
+      panels,
+      activePanels,
+      screenName
+    );
   };
   const handleHorizontalChange = (e) => {
-    const value = Number(e.target.value);
+    const value = e.target.value;
     // if (value < 1) {
     //   toast.error("Value cant be less than one");
-      
+
     // }
     setHorizontal(value);
 
-    getData(ratio, unit, vertical, value, id, title,type,panels,activePanels);
+    getData(
+      ratio,
+      unit,
+      vertical,
+      value,
+      id,
+      title,
+      type,
+      panels,
+      activePanels,
+      screenName
+    );
   };
   const handleVerticalChange = (e) => {
-    const value = Number(e.target.value);
+    const value = e.target.value;
     // if (value < 1) {
     //   toast.error("Value cant be less than one");
     // }
     setVertical(value);
-  
 
-    getData(ratio, unit, value, horizontal, id, title,type,panels,activePanels);
+    getData(
+      ratio,
+      unit,
+      value,
+      horizontal,
+      id,
+      title,
+      type,
+      panels,
+      activePanels,
+      screenName
+    );
   };
 
   const handleProductChange = (e) => {
@@ -344,9 +437,19 @@ function Panel() {
     //   toast.error("Value cant be less than one");
     // }
     setType(value);
-  
 
-    getData(ratio, unit, vertical, horizontal, id, title,e.target.value,panels,activePanels);
+    getData(
+      ratio,
+      unit,
+      vertical,
+      horizontal,
+      id,
+      title,
+      e.target.value,
+      panels,
+      activePanels,
+      screenName
+    );
   };
 
   useEffect(() => {
@@ -375,28 +478,41 @@ function Panel() {
     const updatedPanels = panels.map((panelRow, i) =>
       panelRow.map((panel, j) => (i === row && j === col ? !panel : panel))
     );
-    const trueCount = updatedPanels.flat().filter(panel => panel === true).length;
-    setActivePanels(trueCount)
-    getData(ratio, unit, vertical, horizontal, id, title,type,updatedPanels,trueCount);
+    const trueCount = updatedPanels
+      .flat()
+      .filter((panel) => panel === true).length;
+    setActivePanels(trueCount);
+    getData(
+      ratio,
+      unit,
+      vertical,
+      horizontal,
+      id,
+      title,
+      type,
+      updatedPanels,
+      trueCount,
+      screenName
+    );
     setPanels(updatedPanels);
   };
 
-
   const handleRefresh = () => {
+    navigate(`/`);
     window.location.reload();
     toast.success("Page refreshed successfully");
- };
- 
- const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href)
-       .then(() => {
-          toast.success("Link copied to clipboard!");
-       })
-       .catch((err) => {
-          toast.error("Failed to copy link: " + err);
-       });
- };
- 
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard
+      .writeText(window.location.href)
+      .then(() => {
+        toast.success("Link copied to clipboard!");
+      })
+      .catch((err) => {
+        toast.error("Failed to copy link: " + err);
+      });
+  };
 
   return (
     <Grid
@@ -408,11 +524,20 @@ function Panel() {
           width={"100%"}
           sx={{
             display: "flex",
-            justifyContent: "center",
+            justifyContent: "space-between",
             alignItems: "center",
+            flexDirection:{md:'row',xs:'column'}
           }}
         >
-           {/* <img src="/logoPanel.png" style={{height:'150px',objectFit:'cover',width:'150px',position:'absolute',top:-45,left:-30,zIndex:3}}/> */}
+          <img
+            src="/logoPanel.png"
+            style={{
+              height: "70px",
+              objectFit: "contain",
+              width: "100px",
+              padding: "5px",
+            }}
+          />
 
           {!isEditTitle ? (
             <Typography
@@ -426,7 +551,7 @@ function Panel() {
               {title}
             </Typography>
           ) : (
-            <Box display={"flex"} mt={4} width={"50%"} gap={3}>
+            <Box display={"flex"} mt={{md:2,xs:0}} width={"50%"} gap={3}>
               <TextField
                 value={title}
                 sx={{ width: "100%", textAlign: "center" }}
@@ -438,15 +563,39 @@ function Panel() {
               </IconButton>
             </Box>
           )}
+
+          <Box
+            display={"flex"}
+            gap={2}
+            justifyContent={"end"}
+            alignItems={"center"}
+            mr={1}
+            mt={{md:0,xs:2}}
+          >
+            <IconButton
+              sx={{ background: "black", color: "#c0d144" }}
+              onClick={handleRefresh}
+            >
+              <RefreshIcon />
+            </IconButton>
+            <IconButton
+              sx={{ background: "black", color: "#c0d144" }}
+              onClick={handleCopyLink}
+            >
+              <ContentCopyIcon />
+            </IconButton>
+          </Box>
         </Box>
-         
+
         <IconButton
           onClick={() => setSettings(!showSettings)}
           sx={{
             display: { xs: "block", md: "none" },
-            position:'absolute',
-            bgcolor: showSettings ? "#303f9f" : "white",
-            color: showSettings ? "white" : "#303f9f",
+            position: "absolute",
+            // bgcolor: showSettings ? "black" : "black",
+            color: showSettings ? "black" : "black",
+            top:5,
+            left:5
           }}
         >
           <SettingsIcon />
@@ -465,26 +614,30 @@ function Panel() {
             width: { xs: "80%", md: "100%" },
             maxWidth: { xs: 300, md: "100%" },
             height: { xs: "100vh", md: "auto" },
-            bgcolor: "#303f9f",
+            bgcolor: "#c0d144",
             transform: showSettings ? "translateX(0)" : "translateX(-100%)",
             transition: "transform 0.3s ease",
             alignContent: "flex-start",
             display: showSettings || { md: "flex" },
             overflowY: { xs: "auto", md: "visible" },
+            border: "1px solid",
           }}
         >
-                <Grid size={{ md: 0, xs: 12 }} sx={{display:{md:'none',xs:'flex'}}}>
+          <Grid
+            size={{ md: 0, xs: 12 }}
+            sx={{ display: { md: "none", xs: "flex",position:'absolute',top:5,left:5,zindex:2 } }}
+          >
             <Box>
-            <IconButton
-          onClick={() => setSettings(!showSettings)}
-          sx={{
-            // display: { xs: "block", md: "none" },
-            bgcolor: showSettings ? "#303f9f" : "white",
-            color: showSettings ? "white" : "#303f9f",
-          }}
-        >
-          <SettingsIcon />
-        </IconButton>
+              <IconButton
+                onClick={() => setSettings(!showSettings)}
+                sx={{
+                  // display: { xs: "block", md: "none" },
+                //   bgcolor: showSettings ? "black" : "black",
+                  color: showSettings ? "black" : "black",
+                }}
+              >
+                <CloseIcon />
+              </IconButton>
             </Box>
           </Grid>
           <Grid size={{ md: 2.4, xs: 12 }}>
@@ -511,7 +664,7 @@ function Panel() {
               </FormControl>
             </Box>
           </Grid>
-      
+
           <Grid size={{ md: 2.4, xs: 12 }}>
             <Box>
               <FormControl fullWidth sx={selectStyle}>
@@ -566,9 +719,7 @@ function Panel() {
                   type="number"
                   value={horizontal}
                   label="WIDTH"
-                  onChange={(e) => {
-                    handleHorizontalChange(e);
-                  }}
+                  onChange={handleHorizontalChange}
                   //   name="client"
                   //   value={''}
                   //   onChange={handleInputChange}
@@ -586,12 +737,7 @@ function Panel() {
                   type="number"
                   label="HEIGHT"
                   value={vertical}
-                  onChange={(e) => {
-                    handleVerticalChange(e);
-                  }}
-                  //   name="client"
-                  //   value={''}
-                  //   onChange={handleInputChange}
+                  onChange={handleVerticalChange}
                   sx={{ ...textFieldStyle }}
                 />
               </FormControl>
@@ -605,8 +751,8 @@ function Panel() {
           justifyContent={"center"}
           //   width={"98%"}
 
-          height={{md:"75vh",xs:'40vh'}}
-          maxHeight={{md:"75vh",xs:'40vh'}}
+          height={{ md: "75vh", xs: "40vh" }}
+          maxHeight={{ md: "75vh", xs: "40vh" }}
           overflow={"hidden"}
           //   bgcolor={"white"}
           borderRadius={10}
@@ -627,16 +773,24 @@ function Panel() {
               position={"absolute"}
               height={`${panelsY * panelSize}px`}
               left={-125}
-              display={{md:'flex',xs:'none'}}
+              display={{ md: "flex", xs: "none" }}
               justifyContent={"center"}
               alignItems={"center"}
               //   bottom={15}
             >
-                <Box display={'flex'} justifyContent={'center'} alignItems={'center'} flexDirection={'column'}>
+              <Box
+                display={"flex"}
+                justifyContent={"center"}
+                alignItems={"center"}
+                flexDirection={"column"}
 
-              <Typography>{panelsY} PANELS</Typography>
-              <Typography>({panelData.vertical})</Typography>
-                </Box>
+              >
+                <Typography>{panelsY} PANELS</Typography>
+                <Typography>({panelData.vertical} / </Typography>
+                <Typography>
+                  {panelData.unit === "FT" ? panelData.verticalM : ""})
+                </Typography>
+              </Box>
               <Box
                 display={"flex"}
                 flexDirection={"column"}
@@ -657,10 +811,16 @@ function Panel() {
               position={"absolute"}
               width={`${panelsX * panelSize + 30}px`}
               top={-75}
-              display={{md:'block',xs:'none'}}
+              display={{ md: "block", xs: "none" }}
               right={-15}
             >
-              <Typography textAlign={"center"}>{panelsX} PANELS ({panelData.horizontal}) </Typography>
+              <Typography textAlign={"center"}>
+                {panelsX} PANELS (
+                {`${panelData.horizontal} / ${
+                  panelData.unit === "FT" ? panelData.horizontalM : ""
+                }`}
+                )
+              </Typography>
               <Box
                 display={"flex"}
                 justifyContent={"space-between"}
@@ -673,6 +833,42 @@ function Panel() {
                 />
                 <ArrowForwardIosIcon />
               </Box>
+            </Box>
+            <Box
+              justifyContent={"center"}
+              alignItems={"center"}
+               position={"absolute"}
+              width={`${panelsX * panelSize + 30}px`}
+              bottom={-75}
+              display={{ md: "flex", xs: "none" }}
+              right={-15}
+              zIndex={10}
+              mt={4}
+            >
+              {!isName ? (
+                <Typography
+                  onClick={() => setName(true)}
+                  textAlign={"center"}
+                  mt={4}
+                  fontWeight={600}
+                  fontSize={"larger"}
+                  sx={{ cursor: "pointer" }}
+                >
+                  {screenName}
+                </Typography>
+              ) : (
+                <Box display={"flex"} mt={4} width={"50%"} gap={3}>
+                  <TextField
+                    value={screenName}
+                    sx={{ width: "100%", textAlign: "center" }}
+                    variant="standard"
+                    onChange={handleNameChange}
+                  />{" "}
+                  <IconButton onClick={() => setName(false)}>
+                    <SaveIcon />
+                  </IconButton>
+                </Box>
+              )}
             </Box>
             <Box
               sx={{
@@ -709,7 +905,7 @@ function Panel() {
                     style={{
                       width: "100%",
                       height: "100%",
-                    //   border: "1px solid grey",
+                      //   border: "1px solid grey",
                       objectFit: "fill",
                       opacity: isPanelVisible ? 1 : 0,
                       transition: "all 0.5s ease",
@@ -722,21 +918,13 @@ function Panel() {
             )}
           </Box>
         </Box>
-        {/* <Box display={'flex'} gap={2} justifyContent={'end'} alignItems={'center'}>
-      <IconButton onClick={handleRefresh}>
-        <RefreshIcon />
-      </IconButton>
-      <IconButton onClick={handleCopyLink}>
-        <ContentCopyIcon />
-      </IconButton>
-    </Box> */}
       </Grid>
       <Grid size={{ md: 3, xs: 12 }} container>
         <Grid
           maxHeight={"70vh"}
           overflow={"auto"}
           mt={2}
-        //   bgcolor={'#dadded'}
+          //   bgcolor={'#dadded'}
           mr={1}
           size={12}
           boxShadow={
@@ -745,7 +933,7 @@ function Panel() {
           pt={1}
           borderRadius={3}
         >
-          <Box  bgcolor={'#dadded'} pt={1} pb={1} borderRadius={3} m={1}>
+          <Box bgcolor={"black"} pt={1} pb={1} borderRadius={3} m={1}>
             <Box
               display={"flex"}
               justifyContent={"space-between"}
@@ -753,12 +941,12 @@ function Panel() {
               mb={1}
               pb={1}
               px={2}
-              borderBottom={"1px solid #303f9f"}
+              borderBottom={"1px solid #c0d144"}
             >
-              <Typography fontWeight={600} color="#303f9f">
+              <Typography fontWeight={600} color="#c0d144">
                 Total Panels
               </Typography>
-              <Typography fontWeight={600} color="#303f9f">
+              <Typography fontWeight={600} color="#c0d144">
                 {panelData?.totalPanels}
               </Typography>
             </Box>
@@ -769,8 +957,12 @@ function Panel() {
               px={2}
               mb={1}
             >
-              <Typography fontWeight={600}>Panels Wide</Typography>
-              <Typography fontWeight={600}>{panelData?.panelsX}</Typography>
+              <Typography fontWeight={600} color="white">
+                Panels Wide
+              </Typography>
+              <Typography fontWeight={600} color="white">
+                {panelData?.panelsX}
+              </Typography>
             </Box>
             <Box
               display={"flex"}
@@ -779,12 +971,15 @@ function Panel() {
               mb={1}
               px={2}
             >
-              <Typography fontWeight={600}>Panels High</Typography>
-              <Typography fontWeight={600}>{panelData?.panelsY}</Typography>
+              <Typography fontWeight={600} color="white">
+                Panels High
+              </Typography>
+              <Typography fontWeight={600} color="white">
+                {panelData?.panelsY}
+              </Typography>
             </Box>
-    
           </Box>
-          <Box  bgcolor={'#dadded'} pt={1} pb={1} borderRadius={3} m={1}>
+          <Box bgcolor={"black"} pt={1} pb={1} borderRadius={3} m={1}>
             {/* <Box
               display={"flex"}
               justifyContent={"space-between"}
@@ -808,8 +1003,12 @@ function Panel() {
               px={2}
               mb={1}
             >
-              <Typography fontWeight={600}>Panels Width</Typography>
-              <Typography fontWeight={600}>{panelData?.horizontal}</Typography>
+              <Typography fontWeight={600} color="white">
+                Panels Width
+              </Typography>
+              <Typography fontWeight={600} color="white">
+                {panelData?.horizontal}
+              </Typography>
             </Box>
             <Box
               display={"flex"}
@@ -818,13 +1017,16 @@ function Panel() {
               mb={1}
               px={2}
             >
-              <Typography fontWeight={600}>Panels Height</Typography>
-              <Typography fontWeight={600}>{panelData?.vertical}</Typography>
+              <Typography fontWeight={600} color="white">
+                Panels Height
+              </Typography>
+              <Typography fontWeight={600} color="white">
+                {panelData?.vertical}
+              </Typography>
             </Box>
-    
           </Box>
 
-          <Box bgcolor={'#dadded'} pt={1} pb={1} borderRadius={3} m={1}>
+          <Box bgcolor={"black"} pt={1} pb={1} borderRadius={3} m={1}>
             <Box
               display={"flex"}
               justifyContent={"space-between"}
@@ -832,12 +1034,12 @@ function Panel() {
               mb={1}
               pb={1}
               px={2}
-              borderBottom={"1px solid #303f9f"}
+              borderBottom={"1px solid #c0d144"}
             >
-              <Typography fontWeight={600} color="#303f9f">
+              <Typography fontWeight={600} color="#c0d144">
                 Total Pixels
               </Typography>
-              <Typography fontWeight={600} color="#303f9f">
+              <Typography fontWeight={600} color="#c0d144">
                 {panelData?.totalPixels}
               </Typography>
             </Box>
@@ -848,8 +1050,12 @@ function Panel() {
               mb={1}
               px={2}
             >
-              <Typography fontWeight={600}>Pixel Height</Typography>
-              <Typography fontWeight={600}>{panelData?.pixelHeight}</Typography>
+              <Typography fontWeight={600} color="white">
+                Pixel Height
+              </Typography>
+              <Typography fontWeight={600} color="white">
+                {panelData?.pixelHeight}
+              </Typography>
             </Box>
             <Box
               display={"flex"}
@@ -858,12 +1064,16 @@ function Panel() {
               px={2}
               mb={1}
             >
-              <Typography fontWeight={600}>Pixel Width</Typography>
-              <Typography fontWeight={600}>{panelData?.pixelWidth}</Typography>
+              <Typography fontWeight={600} color="white">
+                Pixel Width
+              </Typography>
+              <Typography fontWeight={600} color="white">
+                {panelData?.pixelWidth}
+              </Typography>
             </Box>
           </Box>
 
-          <Box bgcolor={'#dadded'} pt={1} pb={1} borderRadius={3} m={1}>
+          <Box bgcolor={"black"} pt={1} pb={1} borderRadius={3} m={1}>
             <Box
               display={"flex"}
               justifyContent={"space-between"}
@@ -871,12 +1081,12 @@ function Panel() {
               mb={1}
               pb={1}
               px={2}
-              borderBottom={"1px solid #303f9f"}
+              borderBottom={"1px solid #c0d144"}
             >
-              <Typography fontWeight={600} color="#303f9f">
+              <Typography fontWeight={600} color="#c0d144">
                 Total Weight
               </Typography>
-              <Typography fontWeight={600} color="#303f9f">
+              <Typography fontWeight={600} color="#c0d144">
                 {panelData?.totalWeight}
               </Typography>
             </Box>
@@ -887,8 +1097,12 @@ function Panel() {
               mb={1}
               px={2}
             >
-              <Typography fontWeight={600}>Diagonal</Typography>
-              <Typography fontWeight={600}>{panelData?.diagonal}</Typography>
+              <Typography fontWeight={600} color="white">
+                Diagonal
+              </Typography>
+              <Typography fontWeight={600} color="white">
+                {panelData?.diagonal}
+              </Typography>
             </Box>
             <Box
               display={"flex"}
@@ -897,26 +1111,28 @@ function Panel() {
               px={2}
               mb={1}
             >
-              <Typography fontWeight={600}>Processor Ports</Typography>
-              <Typography fontWeight={600}>
+              <Typography fontWeight={600} color="white">
+                Processor Ports
+              </Typography>
+              <Typography fontWeight={600} color="white">
                 {panelData?.processorPorts}
               </Typography>
             </Box>
           </Box>
-          <Box bgcolor={'#dadded'} pt={1} pb={1} borderRadius={3} m={1}>
+          <Box bgcolor={"black"} pt={1} pb={1} borderRadius={3} m={1}>
             <Box
               display={"flex"}
               justifyContent={"space-between"}
               alignItems={"center"}
-              mb={1}
+              //   mb={1}
               pb={1}
               px={2}
-            //   borderBottom={"1px solid #303f9f"}
+              //   borderBottom={"1px solid #303f9f"}
             >
-              <Typography fontWeight={600} color="#303f9f">
-                240V Draw
+              <Typography fontWeight={600} color="#c0d144">
+                220V Draw
               </Typography>
-              <Typography fontWeight={600} color="#303f9f">
+              <Typography fontWeight={600} color="#c0d144">
                 {panelData?.totalAMPS}
               </Typography>
             </Box>
