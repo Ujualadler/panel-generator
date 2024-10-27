@@ -79,13 +79,19 @@ export const selectStyle = {
 };
 
 const versions = ["V1", "V2", "V3"];
-const units = [{name:"IMPERIAL(FT)",unit:'FT'}, {name:"MATRIC(M)",unit:'M'}, {name:"PANELS",unit:'Panels'}];
+const units = [
+  { name: "IMPERIAL(FT)", unit: "FT" },
+  { name: "MATRIC(M)", unit: "M" },
+  { name: "PANELS", unit: "Panels" },
+];
 const ratioData = ["16:9", "21:9", "4:3", "custom"];
 
 function Panel() {
-    const { Id } = useParams();
-    const navigate = useNavigate()
-    const initialLoad = useRef(true);
+  const initialHorizontal = localStorage.getItem("Horizontal");
+
+  const { Id } = useParams();
+  const navigate = useNavigate();
+  const initialLoad = useRef(true);
   const [title, setTitle] = useState("CLICK HERE TO ADD PROJECT TITLE");
   const [isEditTitle, setSsEditTitle] = useState(false);
   const [type, setType] = useState("");
@@ -109,22 +115,22 @@ function Panel() {
 
   const screenCheck = window.innerWidth;
 
-
-  console.log(unit)
+  console.log(unit);
 
   console.log("Screen Width:", screenWidth);
   console.log("Screen Height:", screenHeight);
 
-//   const baseURL = 'https://panelcalculator.onrender.com'
-  const baseURL = 'https://3607-2401-4900-1c5b-842-5942-b3cf-e8c-86bc.ngrok-free.app'
+  //   const baseURL = 'https://panelcalculator.onrender.com'
+  const baseURL =
+    "https://3607-2401-4900-1c5b-842-5942-b3cf-e8c-86bc.ngrok-free.app";
 
-  async function getData(ratio1,unit1,vertical1,horizontal1,Id1,title1) {
-    let sendID
+  async function getData(ratio1, unit1, vertical1, horizontal1, Id1, title1) {
+    let sendID;
 
-    if(Id1===''){
-        sendID=Id
-    }else{
-       sendID=Id1
+    if (Id1 === "") {
+      sendID = Id;
+    } else {
+      sendID = Id1;
     }
 
     try {
@@ -132,21 +138,32 @@ function Panel() {
         product: 500,
         unit: unit1.unit,
         ratio: ratio1,
-        horizontal: horizontal1,
-        vertical: vertical1,
+        horizontal: horizontal1<1?1:horizontal1,
+        vertical: vertical1<1?1:vertical1,
         id: sendID,
         title: title1,
       });
+
+      localStorage.setItem("horizontal", horizontal1);
+      localStorage.setItem("vertical", vertical1);
+      localStorage.setItem("ratio", ratio1);
+      localStorage.setItem("unit", unit1.unit);
+      localStorage.setItem("title", title1);
+
       console.log(response.data);
       setPanelsX(response.data.panelsX);
       setPanelsY(response.data.panelsY);
 
-    //   Avoid updating ratio and unit unless they differ from the current state
+      //   Avoid updating ratio and unit unless they differ from the current state
       if (response.data.ratio !== ratio) setRatio(response.data.ratio);
-      const updatedUnit = units.find((data) => data.name === response.data.unit);
+      const updatedUnit = units.find(
+        (data) => data.name === response.data.unit
+      );
       if (updatedUnit && updatedUnit.unit !== unit.unit) setUnit(updatedUnit);
-      if(response.data.horizontal!==horizontal) setHorizontal(Math.round(response.data.horizontal))
-      if(response.data.vertical!==vertical) setVertical(Math.round(response.data.vertical))
+    //   if (response.data.horizontal !== horizontal)
+    //     setHorizontal(Math.round(response.data.horizontal));
+    //   if (response.data.vertical !== vertical)
+    //     setVertical(Math.round(response.data.vertical));
 
       setTitle(response.data.title);
       setPanelData(response.data);
@@ -164,33 +181,89 @@ function Panel() {
   }
 
   useEffect(() => {
-    getData(ratio,unit,vertical,horizontal,id,title);
+    async function getData() {
+      let sendID;
+
+      if (Id) {
+        sendID = Id;
+      } else {
+        sendID = id;
+      }
+
+      try {
+        const response = await axios.post(baseURL, {
+          product: 500,
+          unit: unit.unit,
+          ratio: ratio,
+          horizontal: initialHorizontal ? initialHorizontal : 16,
+          vertical: vertical,
+          id: sendID,
+          title: title,
+        });
+        console.log(response.data);
+        setPanelsX(response.data.panelsX);
+        setPanelsY(response.data.panelsY);
+
+        //   Avoid updating ratio and unit unless they differ from the current state
+        if (response.data.ratio !== ratio) setRatio(response.data.ratio);
+        const updatedUnit = units.find(
+          (data) => data.name === response.data.unit
+        );
+        if (updatedUnit && updatedUnit.unit !== unit.unit) setUnit(updatedUnit);
+        if (response.data.horizontal !== horizontal)
+          setHorizontal(Math.round(response.data.horizontal));
+        if (response.data.vertical !== vertical)
+          setVertical(Math.round(response.data.vertical));
+
+        setTitle(response.data.title);
+        setPanelData(response.data);
+        if (initialLoad.current && Id) {
+          setId(Id);
+          navigate(`/${Id}`);
+        } else if (response.data.id) {
+          setId(response.data.id);
+          navigate(`/${response.data.id}`);
+        }
+        initialLoad.current = false;
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getData();
   }, []); // Dependencies to trigger re-fetch
 
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
-    getData(ratio,unit,vertical,horizontal,id,e.target.value)
-    
-}
-  const handleRatioChange = (e) =>{
-setRatio(e.target.value);
-getData(e.target.value,unit,vertical,horizontal,id,title)
-  }  
+    getData(ratio, unit, vertical, horizontal, id, e.target.value);
+  };
+  const handleRatioChange = (e) => {
+    setRatio(e.target.value);
+    getData(e.target.value, unit, vertical, horizontal, id, title);
+  };
   const handleUnitChange = (e) => {
     setUnit(e.target.value);
-    getData(ratio,e.target.value,vertical,horizontal,id,title)
-  }
+    getData(ratio, e.target.value, vertical, horizontal, id, title);
+  };
   const handleHorizontalChange = (e) => {
     const value = Number(e.target.value);
-     setHorizontal(value);
-     getData(ratio,unit,vertical,value,id,title)
+    if (value < 1) {
+      toast.error("Value cant be less than one");
+      
+    }
+    setHorizontal(value);
+
+    getData(ratio, unit, vertical, value, id, title);
   };
   const handleVerticalChange = (e) => {
     const value = Number(e.target.value);
-     setVertical(value);
-     getData(ratio,unit,value,horizontal,id,title)
-  };
+    if (value < 1) {
+      toast.error("Value cant be less than one");
+    }
+    setVertical(value);
+  
 
+    getData(ratio, unit, value, horizontal, id, title);
+  };
 
   useEffect(() => {
     const panelSizeValue = Math.min(
@@ -204,8 +277,6 @@ getData(e.target.value,unit,vertical,horizontal,id,title)
 
     generateGrid();
   }, [panelsX, panelsY]);
-
-
 
   // Function to initialize grid with "on" state for each panel
   const generateGrid = () => {
@@ -222,8 +293,6 @@ getData(e.target.value,unit,vertical,horizontal,id,title)
     );
     setPanels(updatedPanels);
   };
-
-
 
   return (
     <Grid
@@ -312,7 +381,7 @@ getData(e.target.value,unit,vertical,horizontal,id,title)
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
                   label="PRODUCT TYPE"
-                  onChange={(e)=>setType(e.target.value)}
+                  onChange={(e) => setType(e.target.value)}
                   sx={{ fontSize: "13px" }}
                 >
                   {versions.map((data, index) => (
@@ -379,10 +448,6 @@ getData(e.target.value,unit,vertical,horizontal,id,title)
                   value={horizontal}
                   label="HORIZONTAL"
                   onChange={(e) => {
-                    if (e.target.value < 1) {
-                      toast.error("Value cant be less than one");
-                      return;
-                    }
                     handleHorizontalChange(e);
                   }}
                   //   name="client"
@@ -403,10 +468,6 @@ getData(e.target.value,unit,vertical,horizontal,id,title)
                   label="VERTICAL"
                   value={vertical}
                   onChange={(e) => {
-                    if (e.target.value < 1) {
-                      toast.error("Value cant be less than one");
-                      return;
-                    }
                     handleVerticalChange(e);
                   }}
                   //   name="client"
@@ -663,7 +724,9 @@ getData(e.target.value,unit,vertical,horizontal,id,title)
               mb={1}
             >
               <Typography fontWeight={600}>Processor Ports</Typography>
-              <Typography fontWeight={600}>{panelData?.processorPorts}</Typography>
+              <Typography fontWeight={600}>
+                {panelData?.processorPorts}
+              </Typography>
             </Box>
           </Box>
           <Box border={"1px solid grey"} pt={1} borderRadius={3} m={1}>
