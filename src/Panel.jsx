@@ -552,7 +552,7 @@ function Panel() {
     // Create a new jsPDF instance
     const pdf = new jsPDF("p", "px", [canvas.width, canvas.height]);
     const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = ((canvas.height * pdfWidth) / canvas.width)-500;
+    const pdfHeight = ((canvas.height * pdfWidth) / canvas.width);
 
     pdf.addImage(imageData, "PNG", 0, 0, pdfWidth, pdfHeight);
     pdf.save("download.pdf");
@@ -1021,7 +1021,7 @@ function Panel() {
           </Grid>
           <Grid size={{ md: 3, xs: 12 }} container>
             <Grid
-              maxHeight={{md:"70vh",xs:'fit-content'}}
+              maxHeight={{md:"fit-content",xs:'fit-content'}}
               overflow={"auto"}
               mt={2}
               //   bgcolor={'#dadded'}
