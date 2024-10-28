@@ -844,7 +844,7 @@ function Panel() {
 
               height={{ md: "75vh", xs: "50vh" }}
               maxHeight={{ md: "75vh", xs: "50vh" }}
-            //   overflow={"hidden"}
+              overflow={"hidden"}
               //   bgcolor={"white"}
               //   borderRadius={10}
               alignItems={"center"}
