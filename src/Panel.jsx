@@ -586,42 +586,40 @@ function Panel() {
                   padding: "5px",
                 }}
               />
-                      <Tooltip title="Click to Add Title">
-
-              {!isEditTitle ? (
-                <Typography
-                  onClick={() => {
-                    setSsEditTitle(true);
-                    setTitle("");
-                  }}
-                  textAlign={"center"}
-                  mt={4}
-                  fontWeight={600}
-                  fontSize={"larger"}
-                  sx={{ cursor: "pointer" }}
-                >
-                  {title}
-                </Typography>
-              ) : (
-                <Box
-                  display={"flex"}
-                  mt={{ md: 2, xs: 0 }}
-                  width={"50%"}
-                  gap={3}
-                >
-                  <TextField
-                    value={title}
-                    sx={{ width: "100%", textAlign: "center" }}
-                    variant="standard"
-                    onChange={(e) => setTitle(e.target.value)}
-                  />{" "}
-                  <IconButton onClick={handleTitleChange}>
-                    <SaveIcon />
-                  </IconButton>
-                </Box>
-              )}
-                      </Tooltip>
-
+              <Tooltip title="Click to Add Title">
+                {!isEditTitle ? (
+                  <Typography
+                    onClick={() => {
+                      setSsEditTitle(true);
+                      setTitle("");
+                    }}
+                    textAlign={"center"}
+                    mt={4}
+                    fontWeight={600}
+                    fontSize={"larger"}
+                    sx={{ cursor: "pointer" }}
+                  >
+                    {title}
+                  </Typography>
+                ) : (
+                  <Box
+                    display={"flex"}
+                    mt={{ md: 2, xs: 0 }}
+                    width={"50%"}
+                    gap={3}
+                  >
+                    <TextField
+                      value={title}
+                      sx={{ width: "100%", textAlign: "center" }}
+                      variant="standard"
+                      onChange={(e) => setTitle(e.target.value)}
+                    />{" "}
+                    <IconButton onClick={handleTitleChange}>
+                      <SaveIcon />
+                    </IconButton>
+                  </Box>
+                )}
+              </Tooltip>
 
               <Box
                 display={"flex"}
@@ -632,31 +630,28 @@ function Panel() {
                 mt={{ md: 0, xs: 2 }}
               >
                 <Tooltip title="Refresh">
-
-                <IconButton
-                  sx={{ background: "black", color: "#c0d144" }}
-                  onClick={handleRefresh}
-                >
-                  <RefreshIcon />
-                </IconButton>
+                  <IconButton
+                    sx={{ background: "black", color: "#c0d144" }}
+                    onClick={handleRefresh}
+                  >
+                    <RefreshIcon />
+                  </IconButton>
                 </Tooltip>
                 <Tooltip title="Copy Link">
-
-                <IconButton
-                  sx={{ background: "black", color: "#c0d144" }}
-                  onClick={handleCopyLink}
-                >
-                  <ContentCopyIcon />
-                </IconButton>
+                  <IconButton
+                    sx={{ background: "black", color: "#c0d144" }}
+                    onClick={handleCopyLink}
+                  >
+                    <ContentCopyIcon />
+                  </IconButton>
                 </Tooltip>
                 <Tooltip title="Download as PDF">
-
-                <IconButton
-                  sx={{ background: "black", color: "#c0d144" }}
-                  onClick={handlePrint}
-                >
-                  <PictureAsPdfIcon />
-                </IconButton>
+                  <IconButton
+                    sx={{ background: "black", color: "#c0d144" }}
+                    onClick={handlePrint}
+                  >
+                    <PictureAsPdfIcon />
+                  </IconButton>
                 </Tooltip>
               </Box>
             </Box>
@@ -917,46 +912,45 @@ function Panel() {
                   </Box>
                 </Box>
                 <Tooltip title="Click to Add Name">
-
-                <Box
-                  justifyContent={"center"}
-                  alignItems={"center"}
-                  position={"absolute"}
-                  width={`${panelsX * panelSize + 30}px`}
-                  bottom={-75}
-                  display={{ md: "flex", xs: "flex" }}
-                  right={-15}
-                  zIndex={1}
-                  mt={4}
-                >
-                  {!isName ? (
-                    <Typography
-                      onClick={() => {
-                        setName(true);
-                        setScreenName("");
-                      }}
-                      textAlign={"center"}
-                      mt={4}
-                      fontWeight={600}
-                      fontSize={"larger"}
-                      sx={{ cursor: "pointer" }}
-                    >
-                      {screenName}
-                    </Typography>
-                  ) : (
-                    <Box display={"flex"} mt={4} width={"50%"} gap={3}>
-                      <TextField
-                        value={screenName}
-                        sx={{ width: "100%", textAlign: "center" }}
-                        variant="standard"
-                        onChange={(e) => setScreenName(e.target.value)}
-                      />{" "}
-                      <IconButton onClick={handleNameChange}>
-                        <SaveIcon />
-                      </IconButton>
-                    </Box>
-                  )}
-                </Box>
+                  <Box
+                    justifyContent={"center"}
+                    alignItems={"center"}
+                    position={"absolute"}
+                    width={`${panelsX * panelSize + 30}px`}
+                    bottom={-75}
+                    display={{ md: "flex", xs: "flex" }}
+                    right={-15}
+                    zIndex={1}
+                    mt={4}
+                  >
+                    {!isName ? (
+                      <Typography
+                        onClick={() => {
+                          setName(true);
+                          setScreenName("");
+                        }}
+                        textAlign={"center"}
+                        mt={4}
+                        fontWeight={600}
+                        fontSize={"larger"}
+                        sx={{ cursor: "pointer" }}
+                      >
+                        {screenName}
+                      </Typography>
+                    ) : (
+                      <Box display={"flex"} mt={4} width={"50%"} gap={3}>
+                        <TextField
+                          value={screenName}
+                          sx={{ width: "100%", textAlign: "center" }}
+                          variant="standard"
+                          onChange={(e) => setScreenName(e.target.value)}
+                        />{" "}
+                        <IconButton onClick={handleNameChange}>
+                          <SaveIcon />
+                        </IconButton>
+                      </Box>
+                    )}
+                  </Box>
                 </Tooltip>
                 <Box
                   sx={{
