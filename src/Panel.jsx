@@ -415,17 +415,26 @@ function Panel() {
     );
   };
   const handleHorizontalChange = (e) => {
-    const value = e.target.value;
-    // if (value < 1) {
-    //   toast.error("Value cant be less than one");
 
-    // }
+      const value = e.target.value;
+      let verticalVal
+    if(ratio==='4:3'){
+       verticalVal = Math.round(value*(3/4))
+       setVertical(verticalVal)
+    }else if(ratio ==='16:9'){
+        verticalVal = Math.round(value*(9/16))
+        setVertical(verticalVal)
+    }
+    else if(ratio ==='21:9'){
+        verticalVal =Math.round(value*(9/21))
+        setVertical(verticalVal)
+    }
     setHorizontal(value);
 
     getData(
       ratio,
       unit,
-      vertical,
+      ratio==='custom'?vertical:verticalVal,
       value,
       id,
       title,
@@ -437,16 +446,27 @@ function Panel() {
   };
   const handleVerticalChange = (e) => {
     const value = e.target.value;
-    // if (value < 1) {
-    //   toast.error("Value cant be less than one");
-    // }
+
+    let horizontalVal
+  if(ratio==='4:3'){
+     horizontalVal = MAth.round(value*(4/3))
+     setHorizontal(horizontalVal)
+  }else if(ratio ==='16:9'){
+    horizontalVal =Math.round(value*(16/9))
+    setHorizontal(horizontalVal)
+  }
+  else if(ratio ==='21:9'){
+    horizontalVal =Math.round(value*(21/9))
+    setHorizontal(horizontalVal)
+  }
     setVertical(value);
+    
 
     getData(
       ratio,
       unit,
       value,
-      horizontal,
+      ratio==='custom'?horizontal:horizontalVal,
       id,
       title,
       type,
