@@ -19,9 +19,11 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import CloseIcon from '@mui/icons-material/Close';
-
+import CloseIcon from "@mui/icons-material/Close";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 
 export const textFieldStyle = {
   "& .MuiOutlinedInput-root": {
@@ -100,6 +102,7 @@ const panelArray = [
 
 function Panel() {
   const initialHorizontal = localStorage.getItem("Horizontal");
+  const componentRef = useRef();
 
   const { Id } = useParams();
   const navigate = useNavigate();
@@ -143,8 +146,8 @@ function Panel() {
   //   const baseURL = 'https://panelcalculator.onrender.com'
   //   const baseURL =
   //     "https://3607-2401-4900-1c5b-842-5942-b3cf-e8c-86bc.ngrok-free.app";
-//   const baseURL = "http://192.168.1.24:4000";
-const baseURL = "https://api.screencalculator.in";
+  //   const baseURL = "http://192.168.1.24:4000";
+  const baseURL = "https://api.screencalculator.in";
 
   async function getData(
     ratio1,
@@ -208,9 +211,20 @@ const baseURL = "https://api.screencalculator.in";
       //   if (response.data.vertical !== vertical)
       //     setVertical(Math.round(response.data.vertical));
 
+      //   console.log(Math.round(Number(response.data.horizontal.split(' ')[0])))
+      console.log(Math.round(Number(response.data.vertical.split(" ")[0])));
+
+      //   console.log(response.data.horizontal)
+      console.log(response.data.vertical);
+
       setTitle(response.data.title);
       setScreenName(response.data.screenName);
       setPanelData(response.data);
+      if (response.data.ratio !== ratio) {
+        // setHorizontal(Math.round(Number(response.data.horizontal.split(' ')[0])))
+        setVertical(Math.round(Number(response.data.vertical.split(" ")[0])));
+      }
+
       if (initialLoad.current && Id) {
         setId(Id);
         navigate(`/${Id}`);
@@ -329,23 +343,10 @@ const baseURL = "https://api.screencalculator.in";
   }, []); // Dependencies to trigger re-fetch
 
   const handleTitleChange = (e) => {
-    setTitle(e.target.value);
-    getData(
-      ratio,
-      unit,
-      vertical,
-      horizontal,
-      id,
-      e.target.value,
-      type,
-      panels,
-      activePanels,
-      screenName
-    );
-  };
-  const handleNameChange = (e) => {
-    const value = e.target.value;
-    setScreenName(value); // Update the screenName in state
+    if (!title.trim()) {
+      toast.error(`Title can't be empty`);
+      return;
+    }
     getData(
       ratio,
       unit,
@@ -356,8 +357,30 @@ const baseURL = "https://api.screencalculator.in";
       type,
       panels,
       activePanels,
-      value // Use `value` here
+      screenName
     );
+    setSsEditTitle(false);
+  };
+
+  const handleNameChange = (e) => {
+    if (!screenName.trim()) {
+      toast.error('Name Can"t be empty');
+      return;
+    }
+
+    getData(
+      ratio,
+      unit,
+      vertical,
+      horizontal,
+      id,
+      title,
+      type,
+      panels,
+      activePanels,
+      screenName // Use `value` here
+    );
+    setName(false);
   };
 
   const handleRatioChange = (e) => {
@@ -504,6 +527,26 @@ const baseURL = "https://api.screencalculator.in";
     toast.success("Page refreshed successfully");
   };
 
+  const handlePrint = async () => {
+    const element = componentRef.current;
+
+     // Use html2canvas to capture the element with a higher scale for better quality
+  const canvas = await html2canvas(element, {
+    scale: 2, // Increase the scale to capture higher quality (adjust as needed)
+    useCORS: true // This helps with loading external images if you have any
+  });
+
+  const imageData = canvas.toDataURL('image/png');
+
+  // Create a new jsPDF instance
+  const pdf = new jsPDF('p', 'px', [canvas.width, canvas.height]);
+  const pdfWidth = pdf.internal.pageSize.getWidth();
+  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+  pdf.addImage(imageData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+  pdf.save('download.pdf');
+  };
+
   const handleCopyLink = () => {
     navigator.clipboard
       .writeText(window.location.href)
@@ -516,472 +559,502 @@ const baseURL = "https://api.screencalculator.in";
   };
 
   return (
-    <Grid
-      container
-      //   sx={{ minHeight: "100vh", minWidth: "100vw", background: "#fff" }}
-    >
-      <Grid size={12}>
-        <Box
-          width={"100%"}
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexDirection:{md:'row',xs:'column'}
-          }}
-        >
-          <img
-            src="/logoPanel.png"
-            style={{
-              height: "70px",
-              objectFit: "contain",
-              width: "100px",
-              padding: "5px",
-            }}
-          />
-
-          {!isEditTitle ? (
-            <Typography
-              onClick={() => setSsEditTitle(true)}
-              textAlign={"center"}
-              mt={4}
-              fontWeight={600}
-              fontSize={"larger"}
-              sx={{ cursor: "pointer" }}
-            >
-              {title}
-            </Typography>
-          ) : (
-            <Box display={"flex"} mt={{md:2,xs:0}} width={"50%"} gap={3}>
-              <TextField
-                value={title}
-                sx={{ width: "100%", textAlign: "center" }}
-                variant="standard"
-                onChange={handleTitleChange}
-              />{" "}
-              <IconButton onClick={() => setSsEditTitle(false)}>
-                <SaveIcon />
-              </IconButton>
-            </Box>
-          )}
-
-          <Box
-            display={"flex"}
-            gap={2}
-            justifyContent={"end"}
-            alignItems={"center"}
-            mr={1}
-            mt={{md:0,xs:2}}
-          >
-            <IconButton
-              sx={{ background: "black", color: "#c0d144" }}
-              onClick={handleRefresh}
-            >
-              <RefreshIcon />
-            </IconButton>
-            <IconButton
-              sx={{ background: "black", color: "#c0d144" }}
-              onClick={handleCopyLink}
-            >
-              <ContentCopyIcon />
-            </IconButton>
-          </Box>
-        </Box>
-
-        <IconButton
-          onClick={() => setSettings(!showSettings)}
-          sx={{
-            display: { xs: "block", md: "none" },
-            position: "absolute",
-            // bgcolor: showSettings ? "black" : "black",
-            color: showSettings ? "black" : "black",
-            top:5,
-            left:5
-          }}
-        >
-          <SettingsIcon />
-        </IconButton>
-
+    <div>
+      <div ref={componentRef}>
         <Grid
           container
-          spacing={3}
-          sx={{
-            p: 3,
-            zIndex: 1,
-            position: { xs: "fixed", md: "static" },
-            top: 0,
-            left: 0,
-            pt: { xs: 10, md: 3 },
-            width: { xs: "80%", md: "100%" },
-            maxWidth: { xs: 300, md: "100%" },
-            height: { xs: "100vh", md: "auto" },
-            bgcolor: "#c0d144",
-            transform: showSettings ? "translateX(0)" : "translateX(-100%)",
-            transition: "transform 0.3s ease",
-            alignContent: "flex-start",
-            display: showSettings || { md: "flex" },
-            overflowY: { xs: "auto", md: "visible" },
-            border: "1px solid",
-          }}
+
+          //   sx={{ minHeight: "100vh", minWidth: "100vw", background: "#fff" }}
         >
-          <Grid
-            size={{ md: 0, xs: 12 }}
-            sx={{ display: { md: "none", xs: "flex",position:'absolute',top:5,left:5,zindex:2 } }}
-          >
-            <Box>
-              <IconButton
-                onClick={() => setSettings(!showSettings)}
-                sx={{
-                  // display: { xs: "block", md: "none" },
-                //   bgcolor: showSettings ? "black" : "black",
-                  color: showSettings ? "black" : "black",
+          <Grid size={12}>
+            <Box
+              width={"100%"}
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexDirection: { md: "row", xs: "column" },
+              }}
+            >
+              <img
+                src="/logoPanel.png"
+                style={{
+                  height: "80px",
+                  objectFit: "contain",
+                  width: "100px",
+                  padding: "5px",
                 }}
-              >
-                <CloseIcon />
-              </IconButton>
-            </Box>
-          </Grid>
-          <Grid size={{ md: 2.4, xs: 12 }}>
-            <Box>
-              <FormControl fullWidth sx={selectStyle}>
-                <InputLabel id="demo-simple-select-label">
-                  PRODUCT TYPE
-                </InputLabel>
-                <Select
-                  //   variant="standard"
-                  value={type}
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  label="PRODUCT TYPE"
-                  onChange={handleProductChange}
-                  sx={{ fontSize: "13px" }}
-                >
-                  {versions.map((data, index) => (
-                    <MenuItem key={index} value={data}>
-                      {data}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
-          </Grid>
+              />
 
-          <Grid size={{ md: 2.4, xs: 12 }}>
-            <Box>
-              <FormControl fullWidth sx={selectStyle}>
-                <InputLabel id="demo-simple-select-label">UNITS</InputLabel>
-                <Select
-                  //   variant="standard"
-                  value={unit}
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  label="UNITS"
-                  onChange={handleUnitChange}
-                  //   sx={selectStyle}
-                >
-                  {units.map((data, index) => (
-                    <MenuItem key={index} value={data}>
-                      {data.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
-          </Grid>
-          <Grid size={{ md: 2.4, xs: 12 }}>
-            <Box>
-              <FormControl fullWidth sx={selectStyle}>
-                <InputLabel id="demo-simple-select-label">RATIO</InputLabel>
-                <Select
-                  //   variant="standard"
-                  value={ratio}
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  label="RATIO"
-                  onChange={handleRatioChange}
-                  //   sx={selectStyle}
-                >
-                  {ratioData.length > 0 &&
-                    ratioData?.map((data, index) => (
-                      <MenuItem key={index} value={data}>
-                        {data}
-                      </MenuItem>
-                    ))}
-                </Select>
-              </FormControl>
-            </Box>
-          </Grid>
-          <Grid size={{ md: 2.4, xs: 12 }}>
-            <Box>
-              <FormControl fullWidth>
-                <TextField
-                  //   variant="standard"
-                  fullWidth
-                  type="number"
-                  value={horizontal}
-                  label="WIDTH"
-                  onChange={handleHorizontalChange}
-                  //   name="client"
-                  //   value={''}
-                  //   onChange={handleInputChange}
-                  sx={{ ...textFieldStyle }}
-                />
-              </FormControl>
-            </Box>
-          </Grid>
-          <Grid size={{ md: 2.4, xs: 12 }}>
-            <Box>
-              <FormControl fullWidth>
-                <TextField
-                  //   variant="standard"
-                  fullWidth
-                  type="number"
-                  label="HEIGHT"
-                  value={vertical}
-                  onChange={handleVerticalChange}
-                  sx={{ ...textFieldStyle }}
-                />
-              </FormControl>
-            </Box>
-          </Grid>
-        </Grid>
-      </Grid>
-      <Grid size={{ md: 9, xs: 12 }}>
-        <Box
-          display={"flex"}
-          justifyContent={"center"}
-          //   width={"98%"}
-
-          height={{ md: "75vh", xs: "40vh" }}
-          maxHeight={{ md: "75vh", xs: "40vh" }}
-          overflow={"hidden"}
-          //   bgcolor={"white"}
-          borderRadius={10}
-          alignItems={"center"}
-          //   gap={2}
-        >
-          <Box
-            sx={{
-              width: `${panelsX * panelSize}px`,
-              height: `${panelsY * panelSize}px`,
-              display: "grid",
-              position: "relative",
-              gridTemplateColumns: `repeat(${panelsX}, ${panelSize}px)`,
-              gridTemplateRows: `repeat(${panelsY}, ${panelSize}px)`,
-            }}
-          >
-            <Box
-              position={"absolute"}
-              height={`${panelsY * panelSize}px`}
-              left={-125}
-              display={{ md: "flex", xs: "none" }}
-              justifyContent={"center"}
-              alignItems={"center"}
-              //   bottom={15}
-            >
-              <Box
-                display={"flex"}
-                justifyContent={"center"}
-                alignItems={"center"}
-                flexDirection={"column"}
-
-              >
-                <Typography>{panelsY} PANELS</Typography>
-                <Typography>({panelData.vertical} / </Typography>
-                <Typography>
-                  {panelData.unit === "FT" ? panelData.verticalM : ""})
-                </Typography>
-              </Box>
-              <Box
-                display={"flex"}
-                flexDirection={"column"}
-                alignItems={"center"}
-              >
-                <ArrowBackIosIcon sx={{ transform: "rotate(90deg)" }} />
-                <Box
-                  sx={{
-                    background: "black",
-                    height: `${panelsY * panelSize}px`,
-                  }}
-                  width={"1px"}
-                />
-                <ArrowForwardIosIcon sx={{ transform: "rotate(90deg)" }} />
-              </Box>
-            </Box>
-            <Box
-              position={"absolute"}
-              width={`${panelsX * panelSize + 30}px`}
-              top={-75}
-              display={{ md: "block", xs: "none" }}
-              right={-15}
-            >
-              <Typography textAlign={"center"}>
-                {panelsX} PANELS (
-                {`${panelData.horizontal} / ${
-                  panelData.unit === "FT" ? panelData.horizontalM : ""
-                }`}
-                )
-              </Typography>
-              <Box
-                display={"flex"}
-                justifyContent={"space-between"}
-                alignItems={"center"}
-              >
-                <ArrowBackIosIcon />
-                <Box
-                  sx={{ background: "black", width: "100%" }}
-                  height={"1px"}
-                />
-                <ArrowForwardIosIcon />
-              </Box>
-            </Box>
-            <Box
-              justifyContent={"center"}
-              alignItems={"center"}
-               position={"absolute"}
-              width={`${panelsX * panelSize + 30}px`}
-              bottom={-75}
-              display={{ md: "flex", xs: "none" }}
-              right={-15}
-              zIndex={10}
-              mt={4}
-            >
-              {!isName ? (
+              {!isEditTitle ? (
                 <Typography
-                  onClick={() => setName(true)}
+                  onClick={() => {
+                    setSsEditTitle(true);
+                    setTitle("");
+                  }}
                   textAlign={"center"}
                   mt={4}
                   fontWeight={600}
                   fontSize={"larger"}
                   sx={{ cursor: "pointer" }}
                 >
-                  {screenName}
+                  {title}
                 </Typography>
               ) : (
-                <Box display={"flex"} mt={4} width={"50%"} gap={3}>
+                <Box
+                  display={"flex"}
+                  mt={{ md: 2, xs: 0 }}
+                  width={"50%"}
+                  gap={3}
+                >
                   <TextField
-                    value={screenName}
+                    value={title}
                     sx={{ width: "100%", textAlign: "center" }}
                     variant="standard"
-                    onChange={handleNameChange}
+                    onChange={(e) => setTitle(e.target.value)}
                   />{" "}
-                  <IconButton onClick={() => setName(false)}>
+                  <IconButton onClick={handleTitleChange}>
                     <SaveIcon />
                   </IconButton>
                 </Box>
               )}
+
+              <Box
+                display={"flex"}
+                gap={2}
+                justifyContent={"end"}
+                alignItems={"center"}
+                mr={1}
+                mt={{ md: 0, xs: 2 }}
+              >
+                <IconButton
+                  sx={{ background: "black", color: "#c0d144" }}
+                  onClick={handleRefresh}
+                >
+                  <RefreshIcon />
+                </IconButton>
+                <IconButton
+                  sx={{ background: "black", color: "#c0d144" }}
+                  onClick={handleCopyLink}
+                >
+                  <ContentCopyIcon />
+                </IconButton>
+                <IconButton
+                  sx={{ background: "black", color: "#c0d144" }}
+                  onClick={handlePrint}
+                >
+                  <PictureAsPdfIcon />
+                </IconButton>
+              </Box>
             </Box>
-            <Box
+
+            <IconButton
+              onClick={() => setSettings(!showSettings)}
               sx={{
-                height: `${3.6 * panelSize}px`,
+                display: { xs: "block", md: "none" },
                 position: "absolute",
-                display: { xs: "none", md: "flex" },
-                bottom: 0,
-                right: `calc(-${panelSize + 15}px)`,
+                // bgcolor: showSettings ? "black" : "black",
+                color: showSettings ? "black" : "black",
+                top: 5,
+                left: 5,
               }}
             >
-              <img
-                src="/manY.png"
-                style={{
-                  height: "100%",
-                  objectFit: "contain",
+              <SettingsIcon />
+            </IconButton>
+
+            <Grid
+              container
+              spacing={3}
+              sx={{
+                p: 3,
+                zIndex: 10,
+                position: { xs: "fixed", md: "static" },
+                top: 0,
+                left: 0,
+                pt: { xs: 10, md: 3 },
+                width: { xs: "80%", md: "100%" },
+                maxWidth: { xs: 300, md: "100%" },
+                height: { xs: "100vh", md: "auto" },
+                bgcolor: "#c0d144",
+                transform: showSettings ? "translateX(0)" : "translateX(-100%)",
+                transition: "transform 0.3s ease",
+                alignContent: "flex-start",
+                display: showSettings || { md: "flex" },
+                overflowY: { xs: "auto", md: "visible" },
+                border: "1px solid",
+              }}
+            >
+              <Grid
+                size={{ md: 0, xs: 12 }}
+                sx={{
+                  display: {
+                    md: "none",
+                    xs: "flex",
+                    position: "absolute",
+                    top: 5,
+                    left: 5,
+                    zindex: 2,
+                  },
                 }}
-              />
-            </Box>
+              >
+                <Box>
+                  <IconButton
+                    onClick={() => setSettings(!showSettings)}
+                    sx={{
+                      // display: { xs: "block", md: "none" },
+                      //   bgcolor: showSettings ? "black" : "black",
+                      color: showSettings ? "black" : "black",
+                    }}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </Box>
+              </Grid>
+              <Grid size={{ md: 2.4, xs: 12 }}>
+                <Box>
+                  <FormControl fullWidth sx={selectStyle}>
+                    <InputLabel id="demo-simple-select-label">
+                      PRODUCT TYPE
+                    </InputLabel>
+                    <Select
+                      //   variant="standard"
+                      value={type}
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      label="PRODUCT TYPE"
+                      onChange={handleProductChange}
+                      sx={{ fontSize: "13px" }}
+                    >
+                      {versions.map((data, index) => (
+                        <MenuItem key={index} value={data}>
+                          {data}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Box>
+              </Grid>
 
-            {panels.map((row, rowIndex) =>
-              row.map((isPanelVisible, colIndex) => (
+              <Grid size={{ md: 2.4, xs: 12 }}>
+                <Box>
+                  <FormControl fullWidth sx={selectStyle}>
+                    <InputLabel id="demo-simple-select-label">UNITS</InputLabel>
+                    <Select
+                      //   variant="standard"
+                      value={unit}
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      label="UNITS"
+                      onChange={handleUnitChange}
+                      //   sx={selectStyle}
+                    >
+                      {units.map((data, index) => (
+                        <MenuItem key={index} value={data}>
+                          {data.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Box>
+              </Grid>
+              <Grid size={{ md: 2.4, xs: 12 }}>
+                <Box>
+                  <FormControl fullWidth sx={selectStyle}>
+                    <InputLabel id="demo-simple-select-label">RATIO</InputLabel>
+                    <Select
+                      //   variant="standard"
+                      value={ratio}
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      label="RATIO"
+                      onChange={handleRatioChange}
+                      //   sx={selectStyle}
+                    >
+                      {ratioData.length > 0 &&
+                        ratioData?.map((data, index) => (
+                          <MenuItem key={index} value={data}>
+                            {data}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  </FormControl>
+                </Box>
+              </Grid>
+              <Grid size={{ md: 2.4, xs: 12 }}>
+                <Box>
+                  <FormControl fullWidth>
+                    <TextField
+                      //   variant="standard"
+                      fullWidth
+                      type="number"
+                      value={horizontal}
+                      label="WIDTH"
+                      onChange={handleHorizontalChange}
+                      //   name="client"
+                      //   value={''}
+                      //   onChange={handleInputChange}
+                      sx={{ ...textFieldStyle }}
+                    />
+                  </FormControl>
+                </Box>
+              </Grid>
+              <Grid size={{ md: 2.4, xs: 12 }}>
+                <Box>
+                  <FormControl fullWidth>
+                    <TextField
+                      //   variant="standard"
+                      fullWidth
+                      type="number"
+                      label="HEIGHT"
+                      value={vertical}
+                      onChange={handleVerticalChange}
+                      sx={{ ...textFieldStyle }}
+                    />
+                  </FormControl>
+                </Box>
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid size={{ md: 9, xs: 12 }}>
+            <Box
+              display={"flex"}
+              justifyContent={"center"}
+              //   width={"98%"}
+
+              height={{ md: "75vh", xs: "40vh" }}
+              maxHeight={{ md: "75vh", xs: "40vh" }}
+              overflow={"hidden"}
+              //   bgcolor={"white"}
+              borderRadius={10}
+              alignItems={"center"}
+              //   gap={2}
+            >
+              <Box
+                sx={{
+                  width: `${panelsX * panelSize}px`,
+                  height: `${panelsY * panelSize}px`,
+                  display: "grid",
+                  position: "relative",
+                  gridTemplateColumns: `repeat(${panelsX}, ${panelSize}px)`,
+                  gridTemplateRows: `repeat(${panelsY}, ${panelSize}px)`,
+                }}
+              >
                 <Box
-                  key={`${rowIndex}-${colIndex}`}
+                  position={"absolute"}
+                  height={`${panelsY * panelSize}px`}
+                  left={-125}
+                  display={{ md: "flex", xs: "none" }}
+                  justifyContent={"center"}
+                  alignItems={"center"}
+                  //   bottom={15}
+                >
+                  <Box
+                    display={"flex"}
+                    justifyContent={"center"}
+                    alignItems={"center"}
+                    flexDirection={"column"}
+                  >
+                    <Typography>{panelsY} PANELS</Typography>
+                    <Typography>({panelData.vertical} / </Typography>
+                    <Typography>
+                      {panelData.unit === "FT" ? panelData.verticalM : ""})
+                    </Typography>
+                  </Box>
+                  <Box
+                    display={"flex"}
+                    flexDirection={"column"}
+                    alignItems={"center"}
+                  >
+                    <ArrowBackIosIcon sx={{ transform: "rotate(90deg)" }} />
+                    <Box
+                      sx={{
+                        background: "black",
+                        height: `${panelsY * panelSize}px`,
+                      }}
+                      width={"1px"}
+                    />
+                    <ArrowForwardIosIcon sx={{ transform: "rotate(90deg)" }} />
+                  </Box>
+                </Box>
+                <Box
+                  position={"absolute"}
+                  width={`${panelsX * panelSize + 30}px`}
+                  top={-75}
+                  display={{ md: "block", xs: "none" }}
+                  right={-15}
+                >
+                  <Typography textAlign={"center"}>
+                    {panelsX} PANELS (
+                    {`${panelData.horizontal} / ${
+                      panelData.unit === "FT" ? panelData.horizontalM : ""
+                    }`}
+                    )
+                  </Typography>
+                  <Box
+                    display={"flex"}
+                    justifyContent={"space-between"}
+                    alignItems={"center"}
+                  >
+                    <ArrowBackIosIcon />
+                    <Box
+                      sx={{ background: "black", width: "100%" }}
+                      height={"1px"}
+                    />
+                    <ArrowForwardIosIcon />
+                  </Box>
+                </Box>
+                <Box
+                  justifyContent={"center"}
+                  alignItems={"center"}
+                  position={"absolute"}
+                  width={`${panelsX * panelSize + 30}px`}
+                  bottom={-75}
+                  display={{ md: "flex", xs: "flex" }}
+                  right={-15}
+                  zIndex={1}
+                  mt={4}
+                >
+                  {!isName ? (
+                    <Typography
+                      onClick={() => {
+                        setName(true);
+                        setScreenName("");
+                      }}
+                      textAlign={"center"}
+                      mt={4}
+                      fontWeight={600}
+                      fontSize={"larger"}
+                      sx={{ cursor: "pointer" }}
+                    >
+                      {screenName}
+                    </Typography>
+                  ) : (
+                    <Box display={"flex"} mt={4} width={"50%"} gap={3}>
+                      <TextField
+                        value={screenName}
+                        sx={{ width: "100%", textAlign: "center" }}
+                        variant="standard"
+                        onChange={(e) => setScreenName(e.target.value)}
+                      />{" "}
+                      <IconButton onClick={handleNameChange}>
+                        <SaveIcon />
+                      </IconButton>
+                    </Box>
+                  )}
+                </Box>
+                <Box
                   sx={{
-                    width: `${panelSize}px`,
-                    height: `${panelSize}px`,
-                    backgroundColor: isPanelVisible ? "#111" : "transparent",
-
-                    cursor: "pointer",
+                    height: `${3.6 * panelSize}px`,
+                    position: "absolute",
+                    display: { xs: "none", md: "flex" },
+                    bottom: 0,
+                    right: `calc(-${panelSize + 15}px)`,
                   }}
-                  onClick={() => togglePanel(rowIndex, colIndex)}
                 >
                   <img
+                    src="/manY.png"
                     style={{
-                      width: "100%",
                       height: "100%",
-                      //   border: "1px solid grey",
-                      objectFit: "fill",
-                      opacity: isPanelVisible ? 1 : 0,
-                      transition: "all 0.5s ease",
+                      objectFit: "contain",
                     }}
-                    src="/wall.jpg"
-                    alt="Panel"
                   />
                 </Box>
-              ))
-            )}
-          </Box>
-        </Box>
-      </Grid>
-      <Grid size={{ md: 3, xs: 12 }} container>
-        <Grid
-          maxHeight={"70vh"}
-          overflow={"auto"}
-          mt={2}
-          //   bgcolor={'#dadded'}
-          mr={1}
-          size={12}
-          boxShadow={
-            "rgba(145, 158, 171, 0.2) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px;"
-          }
-          pt={1}
-          borderRadius={3}
-        >
-          <Box bgcolor={"black"} pt={1} pb={1} borderRadius={3} m={1}>
-            <Box
-              display={"flex"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-              mb={1}
-              pb={1}
-              px={2}
-              borderBottom={"1px solid #c0d144"}
-            >
-              <Typography fontWeight={600} color="#c0d144">
-                Total Panels
-              </Typography>
-              <Typography fontWeight={600} color="#c0d144">
-                {panelData?.totalPanels}
-              </Typography>
+
+                {panels.map((row, rowIndex) =>
+                  row.map((isPanelVisible, colIndex) => (
+                    <Box
+                      key={`${rowIndex}-${colIndex}`}
+                      sx={{
+                        width: `${panelSize}px`,
+                        height: `${panelSize}px`,
+                        backgroundColor: isPanelVisible
+                          ? "#111"
+                          : "transparent",
+
+                        cursor: "pointer",
+                      }}
+                      onClick={() => togglePanel(rowIndex, colIndex)}
+                    >
+                      <img
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          //   border: "1px solid grey",
+                          objectFit: "fill",
+                          opacity: isPanelVisible ? 1 : 0,
+                          transition: "all 0.5s ease",
+                        }}
+                        src="/wall.jpg"
+                        alt="Panel"
+                      />
+                    </Box>
+                  ))
+                )}
+              </Box>
             </Box>
-            <Box
-              display={"flex"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-              px={2}
-              mb={1}
+          </Grid>
+          <Grid size={{ md: 3, xs: 12 }} container>
+            <Grid
+              maxHeight={"70vh"}
+              overflow={"auto"}
+              mt={2}
+              //   bgcolor={'#dadded'}
+              mr={1}
+              size={12}
+              boxShadow={
+                "rgba(145, 158, 171, 0.2) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px;"
+              }
+              pt={1}
+              borderRadius={3}
             >
-              <Typography fontWeight={600} color="white">
-                Panels Wide
-              </Typography>
-              <Typography fontWeight={600} color="white">
-                {panelData?.panelsX}
-              </Typography>
-            </Box>
-            <Box
-              display={"flex"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-              mb={1}
-              px={2}
-            >
-              <Typography fontWeight={600} color="white">
-                Panels High
-              </Typography>
-              <Typography fontWeight={600} color="white">
-                {panelData?.panelsY}
-              </Typography>
-            </Box>
-          </Box>
-          <Box bgcolor={"black"} pt={1} pb={1} borderRadius={3} m={1}>
-            {/* <Box
+              <Box bgcolor={"black"} pt={1} pb={1} borderRadius={3} m={1}>
+                <Box
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                  mb={1}
+                  pb={1}
+                  px={2}
+                  borderBottom={"1px solid #c0d144"}
+                >
+                  <Typography fontWeight={600} color="#c0d144">
+                    Total Panels
+                  </Typography>
+                  <Typography fontWeight={600} color="#c0d144">
+                    {panelData?.totalPanels}
+                  </Typography>
+                </Box>
+                <Box
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                  px={2}
+                  mb={1}
+                >
+                  <Typography fontWeight={600} color="white">
+                    Panels Wide
+                  </Typography>
+                  <Typography fontWeight={600} color="white">
+                    {panelData?.panelsX}
+                  </Typography>
+                </Box>
+                <Box
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                  mb={1}
+                  px={2}
+                >
+                  <Typography fontWeight={600} color="white">
+                    Panels High
+                  </Typography>
+                  <Typography fontWeight={600} color="white">
+                    {panelData?.panelsY}
+                  </Typography>
+                </Box>
+              </Box>
+              <Box bgcolor={"black"} pt={1} pb={1} borderRadius={3} m={1}>
+                {/* <Box
               display={"flex"}
               justifyContent={"space-between"}
               alignItems={"center"}
@@ -997,147 +1070,147 @@ const baseURL = "https://api.screencalculator.in";
                 {panelData?.totalPanels}
               </Typography>
             </Box> */}
-            <Box
-              display={"flex"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-              px={2}
-              mb={1}
-            >
-              <Typography fontWeight={600} color="white">
-                Panels Width
-              </Typography>
-              <Typography fontWeight={600} color="white">
-                {panelData?.horizontal}
-              </Typography>
-            </Box>
-            <Box
-              display={"flex"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-              mb={1}
-              px={2}
-            >
-              <Typography fontWeight={600} color="white">
-                Panels Height
-              </Typography>
-              <Typography fontWeight={600} color="white">
-                {panelData?.vertical}
-              </Typography>
-            </Box>
-          </Box>
+                <Box
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                  px={2}
+                  mb={1}
+                >
+                  <Typography fontWeight={600} color="white">
+                    Panels Width
+                  </Typography>
+                  <Typography fontWeight={600} color="white">
+                    {panelData?.horizontal}
+                  </Typography>
+                </Box>
+                <Box
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                  mb={1}
+                  px={2}
+                >
+                  <Typography fontWeight={600} color="white">
+                    Panels Height
+                  </Typography>
+                  <Typography fontWeight={600} color="white">
+                    {panelData?.vertical}
+                  </Typography>
+                </Box>
+              </Box>
 
-          <Box bgcolor={"black"} pt={1} pb={1} borderRadius={3} m={1}>
-            <Box
-              display={"flex"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-              mb={1}
-              pb={1}
-              px={2}
-              borderBottom={"1px solid #c0d144"}
-            >
-              <Typography fontWeight={600} color="#c0d144">
-                Total Pixels
-              </Typography>
-              <Typography fontWeight={600} color="#c0d144">
-                {panelData?.totalPixels}
-              </Typography>
-            </Box>
-            <Box
-              display={"flex"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-              mb={1}
-              px={2}
-            >
-              <Typography fontWeight={600} color="white">
-                Pixel Height
-              </Typography>
-              <Typography fontWeight={600} color="white">
-                {panelData?.pixelHeight}
-              </Typography>
-            </Box>
-            <Box
-              display={"flex"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-              px={2}
-              mb={1}
-            >
-              <Typography fontWeight={600} color="white">
-                Pixel Width
-              </Typography>
-              <Typography fontWeight={600} color="white">
-                {panelData?.pixelWidth}
-              </Typography>
-            </Box>
-          </Box>
+              <Box bgcolor={"black"} pt={1} pb={1} borderRadius={3} m={1}>
+                <Box
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                  mb={1}
+                  pb={1}
+                  px={2}
+                  borderBottom={"1px solid #c0d144"}
+                >
+                  <Typography fontWeight={600} color="#c0d144">
+                    Total Pixels
+                  </Typography>
+                  <Typography fontWeight={600} color="#c0d144">
+                    {panelData?.totalPixels}
+                  </Typography>
+                </Box>
+                <Box
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                  mb={1}
+                  px={2}
+                >
+                  <Typography fontWeight={600} color="white">
+                    Pixel Height
+                  </Typography>
+                  <Typography fontWeight={600} color="white">
+                    {panelData?.pixelHeight}
+                  </Typography>
+                </Box>
+                <Box
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                  px={2}
+                  mb={1}
+                >
+                  <Typography fontWeight={600} color="white">
+                    Pixel Width
+                  </Typography>
+                  <Typography fontWeight={600} color="white">
+                    {panelData?.pixelWidth}
+                  </Typography>
+                </Box>
+              </Box>
 
-          <Box bgcolor={"black"} pt={1} pb={1} borderRadius={3} m={1}>
-            <Box
-              display={"flex"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-              mb={1}
-              pb={1}
-              px={2}
-              borderBottom={"1px solid #c0d144"}
-            >
-              <Typography fontWeight={600} color="#c0d144">
-                Total Weight
-              </Typography>
-              <Typography fontWeight={600} color="#c0d144">
-                {panelData?.totalWeight}
-              </Typography>
-            </Box>
-            <Box
-              display={"flex"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-              mb={1}
-              px={2}
-            >
-              <Typography fontWeight={600} color="white">
-                Diagonal
-              </Typography>
-              <Typography fontWeight={600} color="white">
-                {panelData?.diagonal}
-              </Typography>
-            </Box>
-            <Box
-              display={"flex"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-              px={2}
-              mb={1}
-            >
-              <Typography fontWeight={600} color="white">
-                Processor Ports
-              </Typography>
-              <Typography fontWeight={600} color="white">
-                {panelData?.processorPorts}
-              </Typography>
-            </Box>
-          </Box>
-          <Box bgcolor={"black"} pt={1} pb={1} borderRadius={3} m={1}>
-            <Box
-              display={"flex"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-              //   mb={1}
-              pb={1}
-              px={2}
-              //   borderBottom={"1px solid #303f9f"}
-            >
-              <Typography fontWeight={600} color="#c0d144">
-                220V Draw
-              </Typography>
-              <Typography fontWeight={600} color="#c0d144">
-                {panelData?.totalAMPS}
-              </Typography>
-            </Box>
-            {/* <Box
+              <Box bgcolor={"black"} pt={1} pb={1} borderRadius={3} m={1}>
+                <Box
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                  mb={1}
+                  pb={1}
+                  px={2}
+                  borderBottom={"1px solid #c0d144"}
+                >
+                  <Typography fontWeight={600} color="#c0d144">
+                    Total Weight
+                  </Typography>
+                  <Typography fontWeight={600} color="#c0d144">
+                    {panelData?.totalWeight}
+                  </Typography>
+                </Box>
+                <Box
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                  mb={1}
+                  px={2}
+                >
+                  <Typography fontWeight={600} color="white">
+                    Diagonal
+                  </Typography>
+                  <Typography fontWeight={600} color="white">
+                    {panelData?.diagonal}
+                  </Typography>
+                </Box>
+                <Box
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                  px={2}
+                  mb={1}
+                >
+                  <Typography fontWeight={600} color="white">
+                    Processor Ports
+                  </Typography>
+                  <Typography fontWeight={600} color="white">
+                    {panelData?.processorPorts}
+                  </Typography>
+                </Box>
+              </Box>
+              <Box bgcolor={"black"} pt={1} pb={1} borderRadius={3} m={1}>
+                <Box
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                  //   mb={1}
+                  pb={1}
+                  px={2}
+                  //   borderBottom={"1px solid #303f9f"}
+                >
+                  <Typography fontWeight={600} color="#c0d144">
+                    220V Draw
+                  </Typography>
+                  <Typography fontWeight={600} color="#c0d144">
+                    {panelData?.totalAMPS}
+                  </Typography>
+                </Box>
+                {/* <Box
               display={"flex"}
               justifyContent={"space-between"}
               alignItems={"center"}
@@ -1147,10 +1220,12 @@ const baseURL = "https://api.screencalculator.in";
               <Typography fontWeight={600}>16 AMP Circuits</Typography>
               <Typography fontWeight={600}>{panelData?.totalAMPS}</Typography>
             </Box> */}
-          </Box>
+              </Box>
+            </Grid>
+          </Grid>
         </Grid>
-      </Grid>
-    </Grid>
+      </div>
+    </div>
   );
 }
 
