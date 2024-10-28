@@ -510,6 +510,12 @@ function Panel() {
     const trueCount = updatedPanels
       .flat()
       .filter((panel) => panel === true).length;
+
+      if(trueCount<1){
+        toast.warning("You must have at least one panel active. You cannot remove all panels.")
+        return
+      }
+
     setActivePanels(trueCount);
     getData(
       ratio,
