@@ -28,21 +28,22 @@ import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 
 export const textFieldStyle = {
   "& .MuiOutlinedInput-root": {
+    background:'black',
     "& fieldset": {
-      borderColor: "black", // Initial outline color
+      borderColor: "white", // Initial outline color
     },
     "&:hover fieldset": {
-      borderColor: "black", // Outline color on hover
+      borderColor: "white", // Outline color on hover
     },
     "&.Mui-focused fieldset": {
-      borderColor: "black", // Outline color when focused
+      borderColor: "white", // Outline color when focused
     },
     color: "white",
     borderRadius: 3,
     height: "45px",
   },
   "& .MuiInputLabel-root": {
-    color: "black", // Initial label color
+    color: "white", // Initial label color
     fontSize: "13px", // Reduced label font size
   },
   "& .MuiInputLabel-root.Mui-focused": {
@@ -50,33 +51,34 @@ export const textFieldStyle = {
     fontSize: "13px", // Ensures size is consistent when focused
   },
   "& .MuiInputBase-input": {
-    color: "black", // Text color
+    color: "white", // Text color
   },
   "& .MuiInputBase-input::placeholder": {
-    color: "black", // Placeholder color
+    color: "white", // Placeholder color
   },
 };
 
 export const selectStyle = {
   "& .MuiOutlinedInput-root": {
+    background:'black',
     "& fieldset": {
-      borderColor: "black", // Initial outline color
+      borderColor: "white", // Initial outline color
     },
     "&:hover fieldset": {
-      borderColor: "black", // Outline color on hover
+      borderColor: "white", // Outline color on hover
     },
     "&.Mui-focused fieldset": {
-      borderColor: "black", // Outline color when focused
+      borderColor: "white", // Outline color when focused
     },
     "& .MuiSelect-select": {
-      color: "black", // Text color
+      color: "white", // Text color
     },
     borderRadius: 3,
     fontSize: "13px",
     height: "45px",
   },
   "& .MuiInputLabel-root": {
-    color: "black", // Initial label color
+    color: "white", // Initial label color
     fontSize: "13px", // Reduced label font size
   },
   "& .MuiInputLabel-root.Mui-focused": {
@@ -540,23 +542,30 @@ function Panel() {
 
   const handlePrint = async () => {
     const element = componentRef.current;
-
+  
     // Use html2canvas to capture the element with a higher scale for better quality
     const canvas = await html2canvas(element, {
-      scale: 2, // Increase the scale to capture higher quality (adjust as needed)
-      useCORS: true, // This helps with loading external images if you have any
+      scale: 2, // Increase the scale for better quality
+      useCORS: true, // Helps with loading external images if you have any
     });
-
-    const imageData = canvas.toDataURL("image/png");
-
-    // Create a new jsPDF instance
-    const pdf = new jsPDF("p", "px", [canvas.width, canvas.height]);
+  
+    // Get the actual content height and width from the canvas (without extra whitespace)
+    const contentWidth = element.scrollWidth;
+    const contentHeight = element.scrollHeight;
+  
+    // Create a new jsPDF instance with the dynamic height and width based on content
+    const pdf = new jsPDF("p", "pt", [contentWidth, contentHeight]);
+  
+    // Calculate the appropriate scale for the content to fit properly
     const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = ((canvas.height * pdfWidth) / canvas.width);
-
+    const pdfHeight = (contentHeight * pdfWidth) / contentWidth;
+  
+    // Add the canvas image to the PDF, using calculated dimensions
+    const imageData = canvas.toDataURL("image/png");
     pdf.addImage(imageData, "PNG", 0, 0, pdfWidth, pdfHeight);
     pdf.save("download.pdf");
   };
+  
 
   const handleCopyLink = () => {
     navigator.clipboard
@@ -591,8 +600,8 @@ function Panel() {
                 src="/logoPanel.png"
                 style={{
                   height: "80px",
-                  objectFit: "contain",
-                  width: "100px",
+                  objectFit: "fill",
+                  width: "110px",
                   padding: "5px",
                 }}
               />
@@ -875,9 +884,9 @@ function Panel() {
                     alignItems={"center"}
                     flexDirection={"column"}
                   >
-                    <Typography>{panelsY} PANELS</Typography>
-                    <Typography>({panelData.vertical} / </Typography>
-                    <Typography>
+                    <Typography fontSize={'13px'} fontWeight={600}>{panelsY} PANELS</Typography>
+                    <Typography fontSize={'13px'} fontWeight={600}>({panelData.vertical} / </Typography>
+                    <Typography fontSize={'13px'} fontWeight={600}>
                       {panelData.unit === "FT" ? panelData.verticalM :panelData.unit==='M'?panelData.verticalF:""})
                     </Typography>
                   </Box>
@@ -891,8 +900,9 @@ function Panel() {
                       sx={{
                         background: "black",
                         height: `${panelsY * panelSize}px`,
+                        
                       }}
-                      width={"1px"}
+                      width={"2px"}
                     />
                     <ArrowForwardIosIcon sx={{ transform: "rotate(90deg)" }} />
                   </Box>
@@ -904,7 +914,7 @@ function Panel() {
                   display={{ md: "block", xs: "none" }}
                   right={-15}
                 >
-                  <Typography textAlign={"center"}>
+                  <Typography fontSize={'13px'} fontWeight={600} textAlign={"center"}>
                     {panelsX} PANELS (
                     {`${panelData.horizontal} / ${
                       panelData.unit === "FT" ? panelData.horizontalM :panelData.unit==='M'?panelData.horizontalF: ""
