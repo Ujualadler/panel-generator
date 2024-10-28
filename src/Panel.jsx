@@ -16,7 +16,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { toast } from "react-toastify";
-import MenuIcon from '@mui/icons-material/Menu';
+import MenuIcon from "@mui/icons-material/Menu";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -28,7 +28,7 @@ import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 
 export const textFieldStyle = {
   "& .MuiOutlinedInput-root": {
-    background:'black',
+    background: "black",
     "& fieldset": {
       borderColor: "white", // Initial outline color
     },
@@ -60,7 +60,7 @@ export const textFieldStyle = {
 
 export const selectStyle = {
   "& .MuiOutlinedInput-root": {
-    background:'black',
+    background: "black",
     "& fieldset": {
       borderColor: "white", // Initial outline color
     },
@@ -174,8 +174,6 @@ function Panel() {
     }
 
     try {
-       
-
       const response = await axios.post(baseURL, {
         product: 500,
         unit: unit1.unit,
@@ -190,7 +188,6 @@ function Panel() {
         screenName: screenName1,
       });
 
-
       setPanelsX(response.data.panelsX);
       setPanelsY(response.data.panelsY);
 
@@ -203,7 +200,6 @@ function Panel() {
         setUnit(updatedUnit[0]);
       if (response.data.product && response.data.product !== type)
         setType(response.data.product);
-
 
       setTitle(response.data.title);
       setScreenName(response.data.screenName);
@@ -236,11 +232,9 @@ function Panel() {
     }
     setPanelSize(panelSizeValue);
 
-    if(isLoaded){
-
-        generateGrid();
+    if (isLoaded) {
+      generateGrid();
     }
-
   }, [panelsX, panelsY]);
 
   useEffect(() => {
@@ -272,7 +266,7 @@ function Panel() {
           setHorizontal(response.data.horizontal);
           setVertical(response.data.vertical);
           setPanels(response.data.panelMatrix);
-          setIsLoaded(false)
+          setIsLoaded(false);
           const trueCount = response.data.panelMatrix
             .flat()
             .filter((panel) => panel === true).length;
@@ -500,8 +494,6 @@ function Panel() {
     );
   };
 
-
-
   // Function to initialize grid with "on" state for each panel
   const generateGrid = () => {
     const newPanels = Array.from({ length: panelsY }, () =>
@@ -542,30 +534,29 @@ function Panel() {
 
   const handlePrint = async () => {
     const element = componentRef.current;
-  
+
     // Use html2canvas to capture the element with a higher scale for better quality
     const canvas = await html2canvas(element, {
       scale: 2, // Increase the scale for better quality
       useCORS: true, // Helps with loading external images if you have any
     });
-  
+
     // Get the actual content height and width from the canvas (without extra whitespace)
     const contentWidth = element.scrollWidth;
     const contentHeight = element.scrollHeight;
-  
+
     // Create a new jsPDF instance with the dynamic height and width based on content
     const pdf = new jsPDF("p", "pt", [contentWidth, contentHeight]);
-  
+
     // Calculate the appropriate scale for the content to fit properly
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = (contentHeight * pdfWidth) / contentWidth;
-  
+
     // Add the canvas image to the PDF, using calculated dimensions
     const imageData = canvas.toDataURL("image/png");
     pdf.addImage(imageData, "PNG", 0, 0, pdfWidth, pdfHeight);
     pdf.save("download.pdf");
   };
-  
 
   const handleCopyLink = () => {
     navigator.clipboard
@@ -594,6 +585,7 @@ function Panel() {
                 justifyContent: "space-between",
                 alignItems: "center",
                 flexDirection: { md: "row", xs: "column" },
+                mb: { md: 0, xs: 3 },
               }}
             >
               <img
@@ -610,9 +602,8 @@ function Panel() {
                   <Typography
                     onClick={() => {
                       setSsEditTitle(true);
-                      if(title==='CLICK HERE TO ADD PROJECT TITLE'){
-
-                          setTitle("");
+                      if (title === "CLICK HERE TO ADD PROJECT TITLE") {
+                        setTitle("");
                       }
                     }}
                     textAlign={"center"}
@@ -689,7 +680,7 @@ function Panel() {
                 left: 5,
               }}
             >
-              <MenuIcon/>
+              <MenuIcon />
             </IconButton>
 
             <Grid
@@ -855,7 +846,7 @@ function Panel() {
               maxHeight={{ md: "75vh", xs: "50vh" }}
               overflow={"hidden"}
               //   bgcolor={"white"}
-              borderRadius={10}
+              //   borderRadius={10}
               alignItems={"center"}
               //   gap={2}
             >
@@ -884,10 +875,19 @@ function Panel() {
                     alignItems={"center"}
                     flexDirection={"column"}
                   >
-                    <Typography fontSize={'13px'} fontWeight={600}>{panelsY} PANELS</Typography>
-                    <Typography fontSize={'13px'} fontWeight={600}>({panelData.vertical} / </Typography>
-                    <Typography fontSize={'13px'} fontWeight={600}>
-                      {panelData.unit === "FT" ? panelData.verticalM :panelData.unit==='M'?panelData.verticalF:""})
+                    <Typography fontSize={"13px"} fontWeight={600}>
+                      {panelsY} PANELS
+                    </Typography>
+                    <Typography fontSize={"13px"} fontWeight={600}>
+                      ({panelData.vertical} /{" "}
+                    </Typography>
+                    <Typography fontSize={"13px"} fontWeight={600}>
+                      {panelData.unit === "FT"
+                        ? panelData.verticalM
+                        : panelData.unit === "M"
+                        ? panelData.verticalF
+                        : ""}
+                      )
                     </Typography>
                   </Box>
                   <Box
@@ -900,7 +900,6 @@ function Panel() {
                       sx={{
                         background: "black",
                         height: `${panelsY * panelSize}px`,
-                        
                       }}
                       width={"2px"}
                     />
@@ -914,10 +913,18 @@ function Panel() {
                   display={{ md: "block", xs: "none" }}
                   right={-15}
                 >
-                  <Typography fontSize={'13px'} fontWeight={600} textAlign={"center"}>
+                  <Typography
+                    fontSize={"13px"}
+                    fontWeight={600}
+                    textAlign={"center"}
+                  >
                     {panelsX} PANELS (
                     {`${panelData.horizontal} / ${
-                      panelData.unit === "FT" ? panelData.horizontalM :panelData.unit==='M'?panelData.horizontalF: ""
+                      panelData.unit === "FT"
+                        ? panelData.horizontalM
+                        : panelData.unit === "M"
+                        ? panelData.horizontalF
+                        : ""
                     }`}
                     )
                   </Typography>
@@ -941,7 +948,7 @@ function Panel() {
                     position={"absolute"}
                     width={`${panelsX * panelSize + 30}px`}
                     bottom={-75}
-                    display={{ md: "flex", xs: "flex" }}
+                    display={{ md: "flex", xs: "none" }}
                     right={-15}
                     zIndex={1}
                     mt={4}
@@ -950,10 +957,9 @@ function Panel() {
                       <Typography
                         onClick={() => {
                           setName(true);
-                          if(screenName==='CLICK HERE TO ADD SCREEN NAME'){
-
+                          if (screenName === "CLICK HERE TO ADD SCREEN NAME") {
                             setScreenName("");
-                        }
+                          }
                         }}
                         textAlign={"center"}
                         mt={4}
@@ -1028,10 +1034,50 @@ function Panel() {
                 )}
               </Box>
             </Box>
+            <Tooltip title="Click to Add Name">
+              <Box
+                justifyContent={"center"}
+                alignItems={"center"}
+                // position={"absolute"}
+                width={`100%`}
+                display={{ md: "none", xs: "flex" }}
+                mt={2}
+              >
+                {!isName ? (
+                  <Typography
+                    onClick={() => {
+                      setName(true);
+                      if (screenName === "CLICK HERE TO ADD SCREEN NAME") {
+                        setScreenName("");
+                      }
+                    }}
+                    textAlign={"center"}
+                    mt={4}
+                    fontWeight={600}
+                    fontSize={"larger"}
+                    sx={{ cursor: "pointer" }}
+                  >
+                    {screenName}
+                  </Typography>
+                ) : (
+                  <Box display={"flex"} mt={4} width={"50%"} gap={3}>
+                    <TextField
+                      value={screenName}
+                      sx={{ width: "100%", textAlign: "center" }}
+                      variant="standard"
+                      onChange={(e) => setScreenName(e.target.value)}
+                    />{" "}
+                    <IconButton onClick={handleNameChange}>
+                      <SaveIcon />
+                    </IconButton>
+                  </Box>
+                )}
+              </Box>
+            </Tooltip>
           </Grid>
           <Grid size={{ md: 3, xs: 12 }} container>
             <Grid
-              maxHeight={{md:"fit-content",xs:'fit-content'}}
+              maxHeight={{ md: "fit-content", xs: "fit-content" }}
               overflow={"auto"}
               mt={2}
               //   bgcolor={'#dadded'}
