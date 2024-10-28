@@ -821,8 +821,8 @@ function Panel() {
               justifyContent={"center"}
               //   width={"98%"}
 
-              height={{ md: "75vh", xs: "40vh" }}
-              maxHeight={{ md: "75vh", xs: "40vh" }}
+              height={{ md: "75vh", xs: "50vh" }}
+              maxHeight={{ md: "75vh", xs: "50vh" }}
               overflow={"hidden"}
               //   bgcolor={"white"}
               borderRadius={10}
