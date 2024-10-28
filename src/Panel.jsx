@@ -43,12 +43,15 @@ export const textFieldStyle = {
     height: "45px",
   },
   "& .MuiInputLabel-root": {
-    color: "white", // Initial label color
+    color: "black", // Initial label color
     fontSize: "13px", // Reduced label font size
+    transform: "translate(14px, -12px) scale(0.75)",
+
   },
   "& .MuiInputLabel-root.Mui-focused": {
-    color: "black", // Label color when focused
+    color: "#c0d144", // Label color when focused
     fontSize: "13px", // Ensures size is consistent when focused
+    // color: 
   },
   "& .MuiInputBase-input": {
     color: "white", // Text color
@@ -78,7 +81,8 @@ export const selectStyle = {
     height: "45px",
   },
   "& .MuiInputLabel-root": {
-    color: "white", // Initial label color
+    transform: "translate(14px, -12px) scale(0.75)",
+    color: "black", // Initial label color
     fontSize: "13px", // Reduced label font size
   },
   "& .MuiInputLabel-root.Mui-focused": {
@@ -597,9 +601,9 @@ function Panel() {
               <img
                 src="/logoPanel.png"
                 style={{
-                  height: "80px",
-                  objectFit: "fill",
-                  width: "110px",
+                    width: "140px",
+                //   height: "120px",
+                  objectFit: "fit-content",
                   padding: "5px",
                 }}
               />
@@ -702,7 +706,7 @@ function Panel() {
                 width: { xs: "80%", md: "100%" },
                 maxWidth: { xs: 300, md: "100%" },
                 height: { xs: "100vh", md: "auto" },
-                bgcolor: "#c0d144",
+                bgcolor: "white",
                 transform: showSettings ? "translateX(0)" : "translateX(-100%)",
                 transition: "transform 0.3s ease",
                 alignContent: "flex-start",
