@@ -16,7 +16,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { toast } from "react-toastify";
-import SettingsIcon from "@mui/icons-material/Settings";
+import MenuIcon from '@mui/icons-material/Menu';
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -125,6 +125,7 @@ function Panel() {
   const [panelSize, setPanelSize] = useState(5); // Store panel states (on/off)
   const [showSettings, setSettings] = useState(false);
   const [activePanels, setActivePanels] = useState(0);
+  const [isLoaded, setIsLoaded] = useState(true);
 
   console.log("first");
 
@@ -171,14 +172,7 @@ function Panel() {
     }
 
     try {
-      //   if (horizontal < 1) {
-      //     toast.error("Value cant be less than one");
-      //     return;
-      //   }
-      //   if (vertical < 1) {
-      //     toast.error("Value cant be less than one");
-      //     return;
-      //   }
+       
 
       const response = await axios.post(baseURL, {
         product: 500,
@@ -194,7 +188,7 @@ function Panel() {
         screenName: screenName1,
       });
 
-      console.log(response.data);
+
       setPanelsX(response.data.panelsX);
       setPanelsY(response.data.panelsY);
 
@@ -207,16 +201,7 @@ function Panel() {
         setUnit(updatedUnit[0]);
       if (response.data.product && response.data.product !== type)
         setType(response.data.product);
-      //   if (response.data.horizontal !== horizontal)
-      //     setHorizontal(Math.round(response.data.horizontal));
-      //   if (response.data.vertical !== vertical)
-      //     setVertical(Math.round(response.data.vertical));
 
-      //   console.log(Math.round(Number(response.data.horizontal.split(' ')[0])))
-      console.log(Math.round(Number(response.data.vertical.split(" ")[0])));
-
-      //   console.log(response.data.horizontal)
-      console.log(response.data.vertical);
 
       setTitle(response.data.title);
       setScreenName(response.data.screenName);
@@ -240,6 +225,23 @@ function Panel() {
   }
 
   useEffect(() => {
+    const panelSizeValue = Math.min(
+      screenHeight / panelsX,
+      screenHeight / panelsY
+    );
+    if (screenCheck > 900) {
+      setSettings(true);
+    }
+    setPanelSize(panelSizeValue);
+
+    if(isLoaded){
+
+        generateGrid();
+    }
+
+  }, [panelsX, panelsY]);
+
+  useEffect(() => {
     async function fetchData() {
       let sendID;
 
@@ -254,6 +256,8 @@ function Panel() {
         try {
           const response = await axios.get(`${baseURL}/${Id}`);
 
+          setIsLoaded(!isLoaded);
+
           if (!response.data) return;
 
           setRatio(response.data.ratio);
@@ -266,6 +270,7 @@ function Panel() {
           setHorizontal(response.data.horizontal);
           setVertical(response.data.vertical);
           setPanels(response.data.panelMatrix);
+          setIsLoaded(false)
           const trueCount = response.data.panelMatrix
             .flat()
             .filter((panel) => panel === true).length;
@@ -415,26 +420,24 @@ function Panel() {
     );
   };
   const handleHorizontalChange = (e) => {
-
-      const value = e.target.value;
-      let verticalVal
-    if(ratio==='4:3'){
-       verticalVal = Math.round(value*(3/4))
-       setVertical(verticalVal)
-    }else if(ratio ==='16:9'){
-        verticalVal = Math.round(value*(9/16))
-        setVertical(verticalVal)
-    }
-    else if(ratio ==='21:9'){
-        verticalVal =Math.round(value*(9/21))
-        setVertical(verticalVal)
+    const value = e.target.value;
+    let verticalVal;
+    if (ratio === "4:3") {
+      verticalVal = Math.round(value * (3 / 4));
+      setVertical(verticalVal);
+    } else if (ratio === "16:9") {
+      verticalVal = Math.round(value * (9 / 16));
+      setVertical(verticalVal);
+    } else if (ratio === "21:9") {
+      verticalVal = Math.round(value * (9 / 21));
+      setVertical(verticalVal);
     }
     setHorizontal(value);
 
     getData(
       ratio,
       unit,
-      ratio==='custom'?vertical:verticalVal,
+      ratio === "custom" ? vertical : verticalVal,
       value,
       id,
       title,
@@ -447,26 +450,24 @@ function Panel() {
   const handleVerticalChange = (e) => {
     const value = e.target.value;
 
-    let horizontalVal
-  if(ratio==='4:3'){
-     horizontalVal = MAth.round(value*(4/3))
-     setHorizontal(horizontalVal)
-  }else if(ratio ==='16:9'){
-    horizontalVal =Math.round(value*(16/9))
-    setHorizontal(horizontalVal)
-  }
-  else if(ratio ==='21:9'){
-    horizontalVal =Math.round(value*(21/9))
-    setHorizontal(horizontalVal)
-  }
+    let horizontalVal;
+    if (ratio === "4:3") {
+      horizontalVal = MAth.round(value * (4 / 3));
+      setHorizontal(horizontalVal);
+    } else if (ratio === "16:9") {
+      horizontalVal = Math.round(value * (16 / 9));
+      setHorizontal(horizontalVal);
+    } else if (ratio === "21:9") {
+      horizontalVal = Math.round(value * (21 / 9));
+      setHorizontal(horizontalVal);
+    }
     setVertical(value);
-    
 
     getData(
       ratio,
       unit,
       value,
-      ratio==='custom'?horizontal:horizontalVal,
+      ratio === "custom" ? horizontal : horizontalVal,
       id,
       title,
       type,
@@ -497,18 +498,7 @@ function Panel() {
     );
   };
 
-  useEffect(() => {
-    const panelSizeValue = Math.min(
-      screenHeight / panelsX,
-      screenHeight / panelsY
-    );
-    if (screenCheck > 900) {
-      setSettings(true);
-    }
-    setPanelSize(panelSizeValue);
 
-    generateGrid();
-  }, [panelsX, panelsY]);
 
   // Function to initialize grid with "on" state for each panel
   const generateGrid = () => {
@@ -562,7 +552,7 @@ function Panel() {
     // Create a new jsPDF instance
     const pdf = new jsPDF("p", "px", [canvas.width, canvas.height]);
     const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    const pdfHeight = ((canvas.height * pdfWidth) / canvas.width)-500;
 
     pdf.addImage(imageData, "PNG", 0, 0, pdfWidth, pdfHeight);
     pdf.save("download.pdf");
@@ -611,7 +601,10 @@ function Panel() {
                   <Typography
                     onClick={() => {
                       setSsEditTitle(true);
-                      setTitle("");
+                      if(title==='CLICK HERE TO ADD PROJECT TITLE'){
+
+                          setTitle("");
+                      }
                     }}
                     textAlign={"center"}
                     mt={4}
@@ -687,7 +680,7 @@ function Panel() {
                 left: 5,
               }}
             >
-              <SettingsIcon />
+              <MenuIcon/>
             </IconButton>
 
             <Grid
@@ -885,7 +878,7 @@ function Panel() {
                     <Typography>{panelsY} PANELS</Typography>
                     <Typography>({panelData.vertical} / </Typography>
                     <Typography>
-                      {panelData.unit === "FT" ? panelData.verticalM : ""})
+                      {panelData.unit === "FT" ? panelData.verticalM :panelData.unit==='M'?panelData.verticalF:""})
                     </Typography>
                   </Box>
                   <Box
@@ -914,7 +907,7 @@ function Panel() {
                   <Typography textAlign={"center"}>
                     {panelsX} PANELS (
                     {`${panelData.horizontal} / ${
-                      panelData.unit === "FT" ? panelData.horizontalM : ""
+                      panelData.unit === "FT" ? panelData.horizontalM :panelData.unit==='M'?panelData.horizontalF: ""
                     }`}
                     )
                   </Typography>
@@ -947,7 +940,10 @@ function Panel() {
                       <Typography
                         onClick={() => {
                           setName(true);
-                          setScreenName("");
+                          if(screenName==='CLICK HERE TO ADD SCREEN NAME'){
+
+                            setScreenName("");
+                        }
                         }}
                         textAlign={"center"}
                         mt={4}
@@ -1025,7 +1021,7 @@ function Panel() {
           </Grid>
           <Grid size={{ md: 3, xs: 12 }} container>
             <Grid
-              maxHeight={"70vh"}
+              maxHeight={{md:"70vh",xs:'fit-content'}}
               overflow={"auto"}
               mt={2}
               //   bgcolor={'#dadded'}
