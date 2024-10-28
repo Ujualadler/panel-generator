@@ -7,6 +7,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
@@ -530,21 +531,21 @@ function Panel() {
   const handlePrint = async () => {
     const element = componentRef.current;
 
-     // Use html2canvas to capture the element with a higher scale for better quality
-  const canvas = await html2canvas(element, {
-    scale: 2, // Increase the scale to capture higher quality (adjust as needed)
-    useCORS: true // This helps with loading external images if you have any
-  });
+    // Use html2canvas to capture the element with a higher scale for better quality
+    const canvas = await html2canvas(element, {
+      scale: 2, // Increase the scale to capture higher quality (adjust as needed)
+      useCORS: true, // This helps with loading external images if you have any
+    });
 
-  const imageData = canvas.toDataURL('image/png');
+    const imageData = canvas.toDataURL("image/png");
 
-  // Create a new jsPDF instance
-  const pdf = new jsPDF('p', 'px', [canvas.width, canvas.height]);
-  const pdfWidth = pdf.internal.pageSize.getWidth();
-  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    // Create a new jsPDF instance
+    const pdf = new jsPDF("p", "px", [canvas.width, canvas.height]);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-  pdf.addImage(imageData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-  pdf.save('download.pdf');
+    pdf.addImage(imageData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.save("download.pdf");
   };
 
   const handleCopyLink = () => {
@@ -585,6 +586,7 @@ function Panel() {
                   padding: "5px",
                 }}
               />
+                      <Tooltip title="Click to Add Title">
 
               {!isEditTitle ? (
                 <Typography
@@ -618,6 +620,8 @@ function Panel() {
                   </IconButton>
                 </Box>
               )}
+                      </Tooltip>
+
 
               <Box
                 display={"flex"}
@@ -627,24 +631,33 @@ function Panel() {
                 mr={1}
                 mt={{ md: 0, xs: 2 }}
               >
+                <Tooltip title="Refresh">
+
                 <IconButton
                   sx={{ background: "black", color: "#c0d144" }}
                   onClick={handleRefresh}
                 >
                   <RefreshIcon />
                 </IconButton>
+                </Tooltip>
+                <Tooltip title="Copy Link">
+
                 <IconButton
                   sx={{ background: "black", color: "#c0d144" }}
                   onClick={handleCopyLink}
                 >
                   <ContentCopyIcon />
                 </IconButton>
+                </Tooltip>
+                <Tooltip title="Download as PDF">
+
                 <IconButton
                   sx={{ background: "black", color: "#c0d144" }}
                   onClick={handlePrint}
                 >
                   <PictureAsPdfIcon />
                 </IconButton>
+                </Tooltip>
               </Box>
             </Box>
 
@@ -903,6 +916,8 @@ function Panel() {
                     <ArrowForwardIosIcon />
                   </Box>
                 </Box>
+                <Tooltip title="Click to Add Name">
+
                 <Box
                   justifyContent={"center"}
                   alignItems={"center"}
@@ -942,6 +957,7 @@ function Panel() {
                     </Box>
                   )}
                 </Box>
+                </Tooltip>
                 <Box
                   sx={{
                     height: `${3.6 * panelSize}px`,
