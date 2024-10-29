@@ -851,7 +851,6 @@ function Panel() {
 
               //   gap={2}
             >
-            
               <Box
                 sx={{
                   width: `${panelsX * panelSize}px`,
@@ -1043,7 +1042,6 @@ function Panel() {
                   width={`100%`}
                   display={{ md: "flex", xs: "flex" }}
                   mt={2}
-                  
                 >
                   {!isName ? (
                     <Typography
