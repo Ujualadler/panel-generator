@@ -534,24 +534,24 @@ function Panel() {
 
   const handlePrint = async () => {
     const element = componentRef.current;
-  
+
     // Use html2canvas to capture the element with a higher scale for better quality
     const canvas = await html2canvas(element, {
       scale: 2, // Increase the scale for better quality
       useCORS: true, // Helps with loading external images if you have any
     });
-  
+
     // Get the actual content height and width from the canvas (without extra whitespace)
     const contentWidth = element.scrollWidth;
     const contentHeight = element.scrollHeight;
-  
-    // Create a new jsPDF instance in landscape orientation
-    const pdf = new jsPDF("l", "pt", [contentWidth, contentHeight]);
-  
+
+    // Create a new jsPDF instance with the dynamic height and width based on content
+    const pdf = new jsPDF(window.innerWidth<900?"p":'1', "pt", [contentWidth, contentHeight]);
+
     // Calculate the appropriate scale for the content to fit properly
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = (contentHeight * pdfWidth) / contentWidth;
-  
+
     // Add the canvas image to the PDF, using calculated dimensions
     const imageData = canvas.toDataURL("image/png");
     pdf.addImage(imageData, "PNG", 0, 0, pdfWidth, pdfHeight);
