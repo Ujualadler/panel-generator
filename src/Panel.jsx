@@ -208,7 +208,7 @@ function Panel() {
       //   setPanels(response.data.panelMatrix)
       setTitle(response.data.title);
       setScreenName(response.data.screenName);
-      //   setPanels(response.data.panelMatrix)
+        setPanels(response.data.panelMatrix)
       setPanelData(response.data);
       if (response.data.ratio !== ratio) {
         // setHorizontal(Math.round(Number(response.data.horizontal.split(' ')[0])))
@@ -239,9 +239,9 @@ function Panel() {
     }
     setPanelSize(panelSizeValue);
 
-    if (isLoaded === true) {
+   
       generateGrid();
-    }
+    
   }, [panelsX, panelsY]);
 
   useEffect(() => {
@@ -1030,7 +1030,7 @@ function Panel() {
                         width: `${panelSize}px`,
                         height: `${panelSize}px`,
                         backgroundColor: isPanelVisible
-                          ? "#111"
+                          ? "transparent"
                           : "transparent",
 
                         cursor: "pointer",
