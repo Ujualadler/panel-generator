@@ -214,7 +214,7 @@ function Panel() {
         // setHorizontal(Math.round(Number(response.data.horizontal.split(' ')[0])))
         setVertical(Math.round(Number(response.data.vertical.split(" ")[0])));
       }
-      setPanels(response.data.panelMatrix);
+    //   setPanels(response.data.panelMatrix);
 
       if (initialLoad.current && Id) {
         setId(Id);
