@@ -46,7 +46,7 @@ export const textFieldStyle = {
     color: "black", // Initial label color
     fontSize: "16px", // Reduced label font size
     transform: "translate(14px, -16px) scale(0.75)",
-    fontWeight:600
+    fontWeight: 600,
   },
   "& .MuiInputLabel-root.Mui-focused": {
     color: "black", // Label color when focused
@@ -84,7 +84,7 @@ export const selectStyle = {
     transform: "translate(14px, -16px) scale(0.75)",
     color: "black", // Initial label color
     fontSize: "16px", // Reduced label font size
-    fontWeight:600
+    fontWeight: 600,
   },
   "& .MuiInputLabel-root.Mui-focused": {
     color: "black", // Label color when focused
@@ -134,29 +134,11 @@ function Panel() {
   const [activePanels, setActivePanels] = useState(0);
   const [isLoaded, setIsLoaded] = useState(true);
 
-  useEffect(() => {
-    if (panels) {
-      console.log("panels>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", panels);
-    }
-  }, [panels]);
-
-  const containerWidth = 400; // Fixed width for the container
-  const containerHeight = 400; // Fixed height for the container
-
   const screenWidth = window.innerWidth / 2;
   const screenHeight = window.innerHeight / 2;
 
   const screenCheck = window.innerWidth;
 
-  console.log(unit);
-
-  console.log("Screen Width:", screenWidth);
-  console.log("Screen Height:", screenHeight);
-
-  //   const baseURL = 'https://panelcalculator.onrender.com'
-  //   const baseURL =
-  //     "https://3607-2401-4900-1c5b-842-5942-b3cf-e8c-86bc.ngrok-free.app";
-  //   const baseURL = "http://192.168.1.24:4000";
   const baseURL = "https://api.screencalculator.in";
 
   async function getData(
@@ -169,7 +151,8 @@ function Panel() {
     type1,
     panels1,
     activePanel1,
-    screenName1
+    screenName1,
+    load = false
   ) {
     let sendID;
 
@@ -201,29 +184,29 @@ function Panel() {
       );
       if (updatedUnit && updatedUnit.unit !== unit.unit)
         setUnit(updatedUnit[0]);
+
       setPanelsX(response.data.panelsX);
       setPanelsY(response.data.panelsY);
-      if (response.data.product && response.data.product !== type)
+
+      if (response.data.product && response.data.product !== type) {
         setType(response.data.product);
-        // setPanels(response.data.panelMatrix)
+      }
+      //   setPanels(response.data.panelMatrix);
       setTitle(response.data.title);
       setScreenName(response.data.screenName);
-        setPanels(response.data.panelMatrix)
       setPanelData(response.data);
       if (response.data.ratio !== ratio) {
-        // setHorizontal(Math.round(Number(response.data.horizontal.split(' ')[0])))
         setVertical(Math.round(Number(response.data.vertical.split(" ")[0])));
       }
-    //   setPanels(response.data.panelMatrix);
 
-      if (initialLoad.current && Id) {
+      if (Id) {
         setId(Id);
         navigate(`/${Id}`);
       } else if (response.data.id) {
         setId(response.data.id);
         navigate(`/${response.data.id}`);
       }
-      initialLoad.current = false;
+      //   initialLoad.current = false;
     } catch (error) {
       console.log(error);
     }
@@ -239,9 +222,10 @@ function Panel() {
     }
     setPanelSize(panelSizeValue);
 
-   
+    if (isLoaded === true) {
       generateGrid();
-    
+    }
+    setIsLoaded(true);
   }, [panelsX, panelsY]);
 
   useEffect(() => {
@@ -274,8 +258,6 @@ function Panel() {
             setUnit(updatedUnit[0]);
           setHorizontal(response.data.horizontal);
           setVertical(response.data.vertical);
-
-          setIsLoaded(false);
           const trueCount = response.data.panelMatrix
             .flat()
             .filter((panel) => panel === true).length;
@@ -297,7 +279,8 @@ function Panel() {
             response.data.product,
             response.data.panelMatrix,
             trueCount,
-            response.data.screenName
+            response.data.screenName,
+            true
           );
         } catch (error) {
           console.log(error);
@@ -330,8 +313,6 @@ function Panel() {
           if (response.data.horizontal !== horizontal)
             if (response.data.vertical !== vertical)
               if (response.data.product && response.data.product !== type)
-                // setHorizontal(Math.round(response.data.horizontal));
-                // setVertical(Math.round(response.data.vertical));
                 setType(response.data.product);
 
           setTitle(response.data.title);
@@ -424,6 +405,7 @@ function Panel() {
       screenName
     );
   };
+
   const handleHorizontalChange = (e) => {
     const value = e.target.value;
     let verticalVal;
@@ -452,6 +434,7 @@ function Panel() {
       screenName
     );
   };
+
   const handleVerticalChange = (e) => {
     const value = e.target.value;
 
@@ -508,15 +491,12 @@ function Panel() {
     const newPanels = Array.from({ length: panelsY }, () =>
       Array.from({ length: panelsX }, () => true)
     );
-
-    console.log(newPanels);
-
     setPanels(newPanels);
   };
 
   // Toggle individual panel on/off
-  const togglePanel = (row, col) => {
-    const updatedPanels = panels.map((panelRow, i) =>
+  const togglePanel = (panel, row, col) => {
+    const updatedPanels = panel.map((panelRow, i) =>
       panelRow.map((panel, j) => (i === row && j === col ? !panel : panel))
     );
     const trueCount = updatedPanels
@@ -544,7 +524,6 @@ function Panel() {
       trueCount,
       screenName
     );
-    
   };
 
   const handleRefresh = () => {
@@ -862,15 +841,17 @@ function Panel() {
               display={"flex"}
               justifyContent={"center"}
               //   width={"98%"}
-
-              height={{ md: "75vh", xs: "50vh" }}
-              maxHeight={{ md: "75vh", xs: "50vh" }}
+              flexDirection={"column"}
+              height={{ md: "85vh", xs: "60vh" }}
+              maxHeight={{ md: "85vh", xs: "60vh" }}
               overflow={"hidden"}
               //   bgcolor={"white"}
               //   borderRadius={10}
               alignItems={"center"}
+
               //   gap={2}
             >
+            
               <Box
                 sx={{
                   width: `${panelsX * panelSize}px`,
@@ -969,7 +950,7 @@ function Panel() {
                     position={"absolute"}
                     width={`${panelsX * panelSize + 30}px`}
                     bottom={-75}
-                    display={{ md: "flex", xs: "none" }}
+                    display={{ md: "none", xs: "none" }}
                     right={-15}
                     zIndex={1}
                     mt={4}
@@ -1036,7 +1017,7 @@ function Panel() {
 
                         cursor: "pointer",
                       }}
-                      onClick={() => togglePanel(rowIndex, colIndex)}
+                      onClick={() => togglePanel(panels, rowIndex, colIndex)}
                     >
                       <img
                         style={{
@@ -1054,47 +1035,48 @@ function Panel() {
                   ))
                 )}
               </Box>
+              <Tooltip title="Click to Add Name">
+                <Box
+                  justifyContent={"center"}
+                  alignItems={"center"}
+                  // position={"absolute"}
+                  width={`100%`}
+                  display={{ md: "flex", xs: "flex" }}
+                  mt={2}
+                  
+                >
+                  {!isName ? (
+                    <Typography
+                      onClick={() => {
+                        setName(true);
+                        if (screenName === "CLICK HERE TO ADD SCREEN NAME") {
+                          setScreenName("");
+                        }
+                      }}
+                      textAlign={"center"}
+                      mt={4}
+                      fontWeight={600}
+                      fontSize={"larger"}
+                      sx={{ cursor: "pointer" }}
+                    >
+                      {screenName}
+                    </Typography>
+                  ) : (
+                    <Box display={"flex"} mt={4} width={"50%"} gap={3}>
+                      <TextField
+                        value={screenName}
+                        sx={{ width: "100%", textAlign: "center" }}
+                        variant="standard"
+                        onChange={(e) => setScreenName(e.target.value)}
+                      />{" "}
+                      <IconButton onClick={handleNameChange}>
+                        <SaveIcon />
+                      </IconButton>
+                    </Box>
+                  )}
+                </Box>
+              </Tooltip>
             </Box>
-            <Tooltip title="Click to Add Name">
-              <Box
-                justifyContent={"center"}
-                alignItems={"center"}
-                // position={"absolute"}
-                width={`100%`}
-                display={{ md: "none", xs: "flex" }}
-                mt={2}
-              >
-                {!isName ? (
-                  <Typography
-                    onClick={() => {
-                      setName(true);
-                      if (screenName === "CLICK HERE TO ADD SCREEN NAME") {
-                        setScreenName("");
-                      }
-                    }}
-                    textAlign={"center"}
-                    mt={4}
-                    fontWeight={600}
-                    fontSize={"larger"}
-                    sx={{ cursor: "pointer" }}
-                  >
-                    {screenName}
-                  </Typography>
-                ) : (
-                  <Box display={"flex"} mt={4} width={"50%"} gap={3}>
-                    <TextField
-                      value={screenName}
-                      sx={{ width: "100%", textAlign: "center" }}
-                      variant="standard"
-                      onChange={(e) => setScreenName(e.target.value)}
-                    />{" "}
-                    <IconButton onClick={handleNameChange}>
-                      <SaveIcon />
-                    </IconButton>
-                  </Box>
-                )}
-              </Box>
-            </Tooltip>
           </Grid>
           <Grid size={{ md: 3, xs: 12 }} container>
             <Grid
