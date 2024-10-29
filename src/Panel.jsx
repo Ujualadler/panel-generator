@@ -30,28 +30,28 @@ export const textFieldStyle = {
   "& .MuiOutlinedInput-root": {
     background: "black",
     "& fieldset": {
-      borderColor: "white", // Initial outline color
+      borderColor: "black", // Initial outline color
     },
     "&:hover fieldset": {
-      borderColor: "white", // Outline color on hover
+      borderColor: "black", // Outline color on hover
     },
     "&.Mui-focused fieldset": {
-      borderColor: "white", // Outline color when focused
+      borderColor: "black", // Outline color when focused
     },
-    color: "white",
+    color: "black",
     borderRadius: 3,
     height: "45px",
   },
   "& .MuiInputLabel-root": {
     color: "black", // Initial label color
-    fontSize: "13px", // Reduced label font size
-    transform: "translate(14px, -12px) scale(0.75)",
-
+    fontSize: "16px", // Reduced label font size
+    transform: "translate(14px, -16px) scale(0.75)",
+    fontWeight:600
   },
   "& .MuiInputLabel-root.Mui-focused": {
-    color: "#c0d144", // Label color when focused
+    color: "black", // Label color when focused
     fontSize: "13px", // Ensures size is consistent when focused
-    // color: 
+    // color:
   },
   "& .MuiInputBase-input": {
     color: "white", // Text color
@@ -65,13 +65,13 @@ export const selectStyle = {
   "& .MuiOutlinedInput-root": {
     background: "black",
     "& fieldset": {
-      borderColor: "white", // Initial outline color
+      borderColor: "black", // Initial outline color
     },
     "&:hover fieldset": {
-      borderColor: "white", // Outline color on hover
+      borderColor: "black", // Outline color on hover
     },
     "&.Mui-focused fieldset": {
-      borderColor: "white", // Outline color when focused
+      borderColor: "black", // Outline color when focused
     },
     "& .MuiSelect-select": {
       color: "white", // Text color
@@ -81,9 +81,10 @@ export const selectStyle = {
     height: "45px",
   },
   "& .MuiInputLabel-root": {
-    transform: "translate(14px, -12px) scale(0.75)",
+    transform: "translate(14px, -16px) scale(0.75)",
     color: "black", // Initial label color
-    fontSize: "13px", // Reduced label font size
+    fontSize: "16px", // Reduced label font size
+    fontWeight:600
   },
   "& .MuiInputLabel-root.Mui-focused": {
     color: "black", // Label color when focused
@@ -133,10 +134,11 @@ function Panel() {
   const [activePanels, setActivePanels] = useState(0);
   const [isLoaded, setIsLoaded] = useState(true);
 
-  console.log("first");
-
-  console.log(panels);
-  console.log("first");
+  useEffect(() => {
+    if (panels) {
+      console.log("panels>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", panels);
+    }
+  }, [panels]);
 
   const containerWidth = 400; // Fixed width for the container
   const containerHeight = 400; // Fixed height for the container
@@ -192,9 +194,6 @@ function Panel() {
         screenName: screenName1,
       });
 
-      setPanelsX(response.data.panelsX);
-      setPanelsY(response.data.panelsY);
-
       //   Avoid updating ratio and unit unless they differ from the current state
       if (response.data.ratio !== ratio) setRatio(response.data.ratio);
       const updatedUnit = units.filter(
@@ -202,16 +201,20 @@ function Panel() {
       );
       if (updatedUnit && updatedUnit.unit !== unit.unit)
         setUnit(updatedUnit[0]);
+      setPanelsX(response.data.panelsX);
+      setPanelsY(response.data.panelsY);
       if (response.data.product && response.data.product !== type)
         setType(response.data.product);
-
+      //   setPanels(response.data.panelMatrix)
       setTitle(response.data.title);
       setScreenName(response.data.screenName);
+      //   setPanels(response.data.panelMatrix)
       setPanelData(response.data);
       if (response.data.ratio !== ratio) {
         // setHorizontal(Math.round(Number(response.data.horizontal.split(' ')[0])))
         setVertical(Math.round(Number(response.data.vertical.split(" ")[0])));
       }
+      setPanels(response.data.panelMatrix);
 
       if (initialLoad.current && Id) {
         setId(Id);
@@ -236,7 +239,7 @@ function Panel() {
     }
     setPanelSize(panelSizeValue);
 
-    if (isLoaded) {
+    if (isLoaded === true) {
       generateGrid();
     }
   }, [panelsX, panelsY]);
@@ -260,6 +263,8 @@ function Panel() {
 
           if (!response.data) return;
 
+          setPanels(response.data.panelMatrix);
+
           setRatio(response.data.ratio);
           const updatedUnit = units.filter(
             (data) => data.unit === response.data.unit
@@ -269,7 +274,7 @@ function Panel() {
             setUnit(updatedUnit[0]);
           setHorizontal(response.data.horizontal);
           setVertical(response.data.vertical);
-          setPanels(response.data.panelMatrix);
+
           setIsLoaded(false);
           const trueCount = response.data.panelMatrix
             .flat()
@@ -503,6 +508,9 @@ function Panel() {
     const newPanels = Array.from({ length: panelsY }, () =>
       Array.from({ length: panelsX }, () => true)
     );
+
+    console.log(newPanels);
+
     setPanels(newPanels);
   };
 
@@ -515,10 +523,12 @@ function Panel() {
       .flat()
       .filter((panel) => panel === true).length;
 
-      if(trueCount<1){
-        toast.warning("You must have at least one panel active. You cannot remove all panels.")
-        return
-      }
+    if (trueCount < 1) {
+      toast.warning(
+        "You must have at least one panel active. You cannot remove all panels."
+      );
+      return;
+    }
 
     setActivePanels(trueCount);
     getData(
@@ -601,8 +611,8 @@ function Panel() {
               <img
                 src="/logoPanel.png"
                 style={{
-                    width: "140px",
-                //   height: "120px",
+                  width: "140px",
+                  //   height: "120px",
                   objectFit: "fit-content",
                   padding: "5px",
                 }}
