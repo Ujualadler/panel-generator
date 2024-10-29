@@ -205,7 +205,7 @@ function Panel() {
       setPanelsY(response.data.panelsY);
       if (response.data.product && response.data.product !== type)
         setType(response.data.product);
-      //   setPanels(response.data.panelMatrix)
+        // setPanels(response.data.panelMatrix)
       setTitle(response.data.title);
       setScreenName(response.data.screenName);
         setPanels(response.data.panelMatrix)
@@ -531,6 +531,7 @@ function Panel() {
     }
 
     setActivePanels(trueCount);
+    setPanels(updatedPanels);
     getData(
       ratio,
       unit,
@@ -543,7 +544,7 @@ function Panel() {
       trueCount,
       screenName
     );
-    setPanels(updatedPanels);
+    
   };
 
   const handleRefresh = () => {
