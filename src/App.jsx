@@ -4,7 +4,7 @@ import "./App.css";
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Panel from "./panel";
+import Panel from "./Panel";
 
  function App() {
 
