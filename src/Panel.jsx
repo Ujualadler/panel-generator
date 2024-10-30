@@ -680,7 +680,7 @@ function Panel() {
                 display: { xs: "block", md: "none" },
                 position: "absolute",
                 // bgcolor: showSettings ? "black" : "black",
-                color: showSettings ? "black" : "black",
+                color: showSettings ? "#c0d144" : "#c0d144",
                 top: 5,
                 left: 5,
               }}
