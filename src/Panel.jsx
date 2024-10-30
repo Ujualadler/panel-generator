@@ -585,6 +585,7 @@ function Panel() {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                bgcolor:'#363636',
                 flexDirection: { md: "row", xs: "column" },
                 mb: { md: 0, xs: 3 },
               }}
@@ -609,6 +610,7 @@ function Panel() {
                     }}
                     textAlign={"center"}
                     mt={4}
+                    color={"white"}
                     fontWeight={600}
                     fontSize={"larger"}
                     sx={{ cursor: "pointer" }}
@@ -624,11 +626,12 @@ function Panel() {
                   >
                     <TextField
                       value={title}
-                      sx={{ width: "100%", textAlign: "center" }}
+                      sx={{...textFieldStyle, width: "100%", textAlign: "center",color:"white" }}
                       variant="standard"
+
                       onChange={(e) => setTitle(e.target.value)}
                     />{" "}
-                    <IconButton onClick={handleTitleChange}>
+                    <IconButton sx={{background:"#c0d144",color:'black'}} onClick={handleTitleChange}>
                       <SaveIcon />
                     </IconButton>
                   </Box>
@@ -641,6 +644,7 @@ function Panel() {
                 justifyContent={"end"}
                 alignItems={"center"}
                 mr={1}
+                mb={{xs:2,md:0}}
                 mt={{ md: 0, xs: 2 }}
               >
                 <Tooltip title="Refresh">
@@ -703,7 +707,7 @@ function Panel() {
                 alignContent: "flex-start",
                 display: showSettings || { md: "flex" },
                 overflowY: { xs: "auto", md: "visible" },
-                border: "1px solid",
+                border:window.innerWidth<900? "1px solid black":'',
               }}
             >
               <Grid
@@ -1083,15 +1087,17 @@ function Panel() {
               overflow={"auto"}
               mt={2}
               //   bgcolor={'#dadded'}
-              mr={1}
+              mr={{xs:0,md:1}}
+              m={{xs:1,md:0}}
               size={12}
+              bgcolor={'#363636'}
               boxShadow={
                 "rgba(145, 158, 171, 0.2) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px;"
               }
               pt={1}
               borderRadius={3}
             >
-              <Box bgcolor={"black"} pt={1} pb={1} borderRadius={3} m={1}>
+              <Box  pt={1} pb={1} borderRadius={3} m={1}>
                 <Box
                   display={"flex"}
                   justifyContent={"space-between"}
@@ -1137,7 +1143,7 @@ function Panel() {
                   </Typography>
                 </Box>
               </Box>
-              <Box bgcolor={"black"} pt={1} pb={1} borderRadius={3} m={1}>
+              <Box  pt={1} pb={1} borderRadius={3} m={1}>
                 {/* <Box
               display={"flex"}
               justifyContent={"space-between"}
@@ -1184,7 +1190,7 @@ function Panel() {
                 </Box>
               </Box>
 
-              <Box bgcolor={"black"} pt={1} pb={1} borderRadius={3} m={1}>
+              <Box  pt={1} pb={1} borderRadius={3} m={1}>
                 <Box
                   display={"flex"}
                   justifyContent={"space-between"}
@@ -1231,7 +1237,7 @@ function Panel() {
                 </Box>
               </Box>
 
-              <Box bgcolor={"black"} pt={1} pb={1} borderRadius={3} m={1}>
+              <Box  pt={1} pb={1} borderRadius={3} m={1}>
                 <Box
                   display={"flex"}
                   justifyContent={"space-between"}
@@ -1277,7 +1283,7 @@ function Panel() {
                   </Typography>
                 </Box>
               </Box>
-              <Box bgcolor={"black"} pt={1} pb={1} borderRadius={3} m={1}>
+              <Box  pt={1} pb={1} borderRadius={3} m={1}>
                 <Box
                   display={"flex"}
                   justifyContent={"space-between"}
